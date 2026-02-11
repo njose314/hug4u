@@ -16,7 +16,6 @@
             --darker-bg: #050810;
             --neon-pink: #ff007f;
             --neon-cyan: #00ffff;
-            --neon-purple: #b300ff;
         }
         
         body {
@@ -28,7 +27,6 @@
             font-family: 'Press Start 2P', cursive;
             color: #fff;
             min-height: 100vh;
-            min-height: 100dvh;
         }
         
         #game-container {
@@ -43,47 +41,40 @@
         }
         
         canvas {
-            box-shadow: 
-                0 0 30px rgba(255, 0, 127, 0.4),
-                0 0 60px rgba(0, 212, 255, 0.2),
-                inset 0 0 30px rgba(255, 0, 127, 0.1);
-            border-radius: 4px;
             border: 4px solid var(--neon-pink);
-            max-width: 100%;
-            max-height: 70vh; 
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
+            border-radius: 4px;
             background: #000;
             display: block;
             image-rendering: pixelated;
         }
         
-        /* UI Top Layer */
+        /* UI Layers */
         .ui-layer {
             width: 100%;
             max-width: 560px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 10px;
+            padding: 10px;
             box-sizing: border-box;
             z-index: 10;
             font-size: 10px;
-            letter-spacing: 1px;
-            text-shadow: 0 0 10px var(--neon-pink);
-            margin-bottom: 8px;
-            line-height: 1.5;
+            text-shadow: 0 0 5px var(--neon-pink);
+            margin-bottom: 5px;
         }
         
         .score-label { color: var(--neon-pink); }
         #score-el { color: var(--neon-cyan); }
-        .goal-label { color: var(--neon-purple); }
+        .goal-label { color: var(--neon-cyan); }
         #target-el { color: #fff; }
 
-        /* Bottom Controls */
+        /* Controls */
         .bottom-controls {
             width: 100%;
             max-width: 560px;
             margin-top: 10px;
-            padding: 10px;
+            padding: 8px;
             background: rgba(0, 0, 0, 0.8);
             border: 2px solid #333;
             border-radius: 4px;
@@ -94,24 +85,10 @@
             color: #aaa;
             text-transform: uppercase;
         }
+        .control-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .control-icon { font-size: 16px; }
 
-        .control-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            text-align: center;
-        }
-
-        .control-icon { font-size: 16px; margin-bottom: 2px; }
-        
-        .hidden {
-            opacity: 0;
-            pointer-events: none;
-            visibility: hidden;
-        }
-
-        /* Screens */
+        /* Overlays */
         .overlay-screen {
             position: absolute;
             inset: 0;
@@ -120,238 +97,109 @@
             align-items: center;
             justify-content: center;
             z-index: 50;
-            transition: opacity 0.5s ease;
             backdrop-filter: blur(10px);
-            padding: 20px;
+            transition: opacity 0.3s ease;
         }
         
-        #start-screen {
-            background: linear-gradient(135deg, rgba(10, 14, 39, 0.98) 0%, rgba(26, 0, 51, 0.98) 100%);
-        }
-
-        #game-over-screen {
-            background: rgba(20, 0, 0, 0.95);
-            z-index: 55;
-        }
-
-        #finale-screen {
-            background: #000;
-            z-index: 60;
-            border: 4px solid var(--neon-pink);
-        }
+        .hidden { opacity: 0; pointer-events: none; }
         
-        /* Titles */
+        #start-screen { background: rgba(10, 14, 39, 0.95); }
+        #game-over-screen { background: rgba(30, 0, 0, 0.95); }
+        #finale-screen { background: #000; border: 4px solid var(--neon-pink); }
+
+        /* Typography */
         .title-main {
             font-family: 'Orbitron', sans-serif;
-            font-size: clamp(2rem, 8vw, 4rem);
+            font-size: clamp(2rem, 8vw, 3.5rem);
             font-weight: 900;
             color: var(--neon-pink);
-            letter-spacing: 4px;
-            margin-bottom: 16px;
+            text-shadow: 4px 4px 0px #550022;
+            margin-bottom: 10px;
             text-align: center;
-            text-shadow: 4px 4px 0px #96004b;
         }
-        
         .title-sub {
-            font-size: clamp(0.5rem, 2.5vw, 0.8rem);
+            font-size: 0.7rem;
             color: var(--neon-cyan);
-            letter-spacing: 1px;
-            margin-bottom: 32px;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
             text-align: center;
-            line-height: 1.5;
         }
         
-        /* Pixel Button */
         .retro-btn {
-            padding: 15px 20px;
+            padding: 15px 25px;
             background: #000;
-            border: 4px solid var(--neon-pink);
+            border: 3px solid var(--neon-pink);
             color: var(--neon-pink);
             font-family: 'Press Start 2P', cursive;
             font-size: 10px;
             cursor: pointer;
-            transition: transform 0.1s;
-            text-transform: uppercase;
-            box-shadow: 6px 6px 0px rgba(255, 0, 127, 0.4);
+            box-shadow: 5px 5px 0px rgba(255, 0, 127, 0.4);
             margin-top: 20px;
-        }
-        
-        .retro-btn:active {
-            transform: translate(4px, 4px);
-            box-shadow: 2px 2px 0px rgba(255, 0, 127, 0.4);
-        }
-
-        /* --- PIXEL ART HEART (CSS ONLY) --- */
-        .pixel-heart-container {
-            width: 100px;
-            height: 100px;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-
-        .pixel-heart-art {
-            width: 10px; 
-            height: 10px; 
-            background: transparent;
-            color: var(--neon-pink);
-            box-shadow: 
-                20px 0, 50px 0,
-                10px 10px, 60px 10px,
-                0 20px, 70px 20px,
-                0 30px, 70px 30px,
-                0 40px, 70px 40px,
-                10px 50px, 60px 50px,
-                20px 60px, 50px 60px,
-                30px 70px, 40px 70px;
-            transform: scale(3);
-            animation: pixelBeat 0.8s infinite alternate;
-        }
-
-        @keyframes pixelBeat {
-            from { transform: scale(3); }
-            to { transform: scale(3.5); filter: brightness(1.3); }
-        }
-        
-        /* Typography */
-        .finale-text {
-            text-align: center;
-            max-width: 600px;
-        }
-        
-        .finale-quote {
-            font-size: clamp(0.7rem, 2vw, 1rem);
-            color: var(--neon-cyan);
-            line-height: 1.8;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 0 #0055aa;
-            border: 2px dashed #333;
-            padding: 20px;
-            background: rgba(0,0,0,0.5);
-        }
-        
-        .finale-title {
-            font-size: 1.5rem;
-            color: var(--neon-pink);
-            margin-bottom: 24px;
             text-transform: uppercase;
-            text-shadow: 3px 3px 0 #550022;
-            animation: rainbow 3s infinite;
         }
+        .retro-btn:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0px rgba(255, 0, 127, 0.4); }
 
-        @keyframes rainbow {
-            0% { color: #ff007f; }
-            33% { color: #00ffff; }
-            66% { color: #ff00ff; }
-            100% { color: #ff007f; }
-        }
-
-        .game-over-title {
-            font-size: 2rem;
-            color: #ff3333;
-            text-shadow: 4px 4px 0 #550000;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .game-over-sub {
-            font-size: 0.8rem;
-            margin-bottom: 30px;
-            color: #ccc;
-            text-align: center;
-            line-height: 1.6;
-        }
-
-        /* Popup Notification */
-        #quote-popup {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translate(-50%, -20px);
-            background: #000;
+        /* Finale Elements */
+        .pixel-heart-container { margin-bottom: 30px; transform: scale(3); }
+        .pixel-heart-art {
+            width: 10px; height: 10px; background: transparent;
             color: var(--neon-pink);
-            padding: 15px 15px;
-            border: 2px solid var(--neon-pink);
-            box-shadow: 4px 4px 0 rgba(255, 0, 127, 0.5);
-            font-size: 9px; 
-            text-align: center;
-            z-index: 100;
-            max-width: 95%;
-            width: 300px;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.2s ease;
-            line-height: 1.4;
+            box-shadow: 20px 0, 50px 0, 10px 10px, 60px 10px, 0 20px, 70px 20px, 0 30px, 70px 30px, 0 40px, 70px 40px, 10px 50px, 60px 50px, 20px 60px, 50px 60px, 30px 70px, 40px 70px;
+            animation: beat 0.8s infinite alternate;
+        }
+        @keyframes beat { to { transform: scale(1.1); filter: brightness(1.2); } }
+
+        .finale-text { text-align: center; max-width: 80%; }
+        .finale-quote {
+            font-size: 0.7rem; color: var(--neon-cyan);
+            line-height: 1.6; margin: 20px 0;
+            padding: 15px; border: 2px dashed #333;
         }
 
-        #quote-popup.visible {
-            opacity: 1;
-            transform: translate(-50%, 0);
+        /* Popup */
+        #quote-popup {
+            position: fixed; top: 20px; left: 50%; transform: translate(-50%, -20px);
+            background: #000; color: var(--neon-pink);
+            padding: 10px 15px; border: 2px solid var(--neon-pink);
+            font-size: 8px; text-align: center; z-index: 100;
+            width: 280px; opacity: 0; transition: all 0.3s;
         }
-        
-        @media (max-width: 600px) {
-            .ui-layer { padding: 10px; }
-            .bottom-controls { flex-wrap: wrap; }
-            .control-item { width: 45%; margin-bottom: 5px; }
-            .title-main { font-size: 2.5rem; }
-        }
+        #quote-popup.visible { opacity: 1; transform: translate(-50%, 0); }
     </style>
 </head>
 <body>
 
 <div id="game-container">
     <div class="ui-layer">
-        <div>
-            <span class="score-label">PTS:</span>
-            <span id="score-el">0</span>
-        </div>
-        <div>
-            <span class="goal-label">GOAL: <span id="target-el">0</span></span>
-        </div>
+        <div><span class="score-label">PTS:</span> <span id="score-el">0</span></div>
+        <div><span class="goal-label">GOAL:</span> <span id="target-el">0</span></div>
     </div>
 
     <canvas id="gameCanvas"></canvas>
 
     <div class="bottom-controls">
-        <div class="control-item">
-            <div class="control-icon">🕹️</div>
-            <div>Swipe</div>
-        </div>
-        <div class="control-item">
-            <div class="control-icon">❤️</div>
-            <div>Collect</div>
-        </div>
-        <div class="control-item">
-            <div class="control-icon">👾</div>
-            <div>Avoid</div>
-        </div>
-         <div class="control-item">
-            <div class="control-icon">⚡</div>
-            <div>Powerup</div>
-        </div>
+        <div class="control-item"><div class="control-icon">🕹️</div><div>Swipe</div></div>
+        <div class="control-item"><div class="control-icon">❤️</div><div>Collect</div></div>
+        <div class="control-item"><div class="control-icon">⚡</div><div>Powerup</div></div>
     </div>
 
     <div id="start-screen" class="overlay-screen">
         <div class="title-main">HEART<br>MAN</div>
-        <div class="title-sub">HUG DAY EDITION<br>v2.0</div>
-        <div id="enemies-display" style="margin: 20px 0; text-align: center; font-size: 8px; color: #00d4ff; line-height: 1.8;"></div>
+        <div class="title-sub">HUG DAY EDITION</div>
+        <div id="enemies-display" style="margin: 20px 0; text-align: center; font-size: 8px; line-height: 1.8;"></div>
         <button id="start-btn" class="retro-btn">INSERT COIN</button>
     </div>
 
     <div id="game-over-screen" class="overlay-screen hidden">
-        <h1 class="game-over-title">GAME OVER</h1>
-        <p class="game-over-sub">The Glooms win this time.<br>But love is persistent.</p>
+        <h1 style="color: #ff3333; margin-bottom: 20px;">GAME OVER</h1>
+        <p style="font-size: 0.7rem; color: #ccc; text-align: center; line-height: 1.5;">The Glooms won.<br>But love persists.</p>
         <button class="retro-btn" onclick="location.reload()">RETRY</button>
     </div>
 
     <div id="finale-screen" class="overlay-screen hidden">
-        <div class="pixel-heart-container">
-            <div class="pixel-heart-art"></div>
-        </div>
+        <div class="pixel-heart-container"><div class="pixel-heart-art"></div></div>
         <div class="finale-text">
-            <h2 class="finale-title">HAPPY HUG DAY</h2>
+            <h2 style="color: var(--neon-pink); margin-bottom: 15px;">HAPPY HUG DAY</h2>
             <div id="final-quote-container" class="finale-quote"></div>
             <button class="retro-btn" onclick="location.reload()">PLAY AGAIN</button>
         </div>
@@ -361,6 +209,7 @@
 </div>
 
 <script>
+    // --- VARIABLES ---
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const scoreEl = document.getElementById('score-el');
@@ -371,10 +220,10 @@
     const quotePopup = document.getElementById('quote-popup');
     const finalQuoteContainer = document.getElementById('final-quote-container');
 
-    // --- CONFIGURATION ---
     const width = 28;
     const TILE_SIZE = 20;
     
+    // Layout: 0=Dot, 1=Wall, 3=Powerup, 4=Empty
     const layout = [
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
         1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -406,105 +255,60 @@
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
     ];
 
-    let squares = [];
-    let score = 0;
-    let winningScore = 0;
-    let gameActive = false;
-    let musicAudio = new Audio('https://ericskiff.com/music/Resistor%20Anthems/06%20A%20Night%20Of%20Dizzy%20Spells.mp3');
-    musicAudio.loop = true;
-    musicAudio.volume = 0.5;
-    
-    // Add prevIndex to track swaps
-    let pacman = { index: 490, dir: 1, nextDir: 1, rot: 0, prevIndex: 490 };
-    let currentSessionQuotes = [];
-
-    const powerupQuotes = [
-        "Imagine me grabbing your bum while we kiss",
-        "Imagine us kissing in the rain on the roof",
-        "Imagine us cuddling in a thunderstorm",
-        "I want to wake up next to you daily",
-        "Your laugh is my favorite sound",
-        "You are my safe space",
-        "Every love song is about you",
-        "I'd choose you in a hundred lifetimes",
-        "Imagine us dancing to jazz in the kitchen",
-        "You make the gloomy days sunny",
-        "I am so addicted to you",
-        "Imagine holding hands on an old street",
-        "My heart beats faster near you",
-        "You are the best thing ever",
-        "I love you more than pizza",
-        "Imagine a lazy Sunday in sheets",
-        "You are my home",
-        "I just want to hold you tight",
-        "Even when I'm angry, I love you",
-        "Imagine us growing old flirting",
-        "You're the peanut butter to my jelly",
-        "I love it when you smile at me",
-        "Imagine late night drives holding hands",
-        "You smell like home",
-        "I crave your touch constantly",
-        "You are my favorite distraction",
-        "I love you to the moon and back",
-        "You are my happy place",
-        "Imagine us star gazing on a hill",
-        "I love the way you look at me",
-        "You're my dream come true",
-        "Imagine breakfast in bed together",
-        "I want to steal your hoodies",
-        "You're sweeter than chocolate",
-        "I get butterflies seeing you",
-        "Imagine us adopting a puppy",
-        "I never want to stop making memories",
-        "Your voice calms my soul",
-        "I love your warm hugs",
-        "You are my forever plus one"
-    ];
-
-    const finaleQuotes = [
-        "No matter how bad the situations are, love always finds a way. I love your hugs.",
-        "In your arms is the only place I want to be. Happy Hug Day.",
-        "A hug from you mends all my broken pieces. You are my everything.",
-        "Distance means nothing when one hug can change everything.",
-        "I would fight the world just to end the day in your arms.",
-        "Your hugs are my anchor in this stormy world.",
-        "One hug from you wipes away a thousand worries.",
-        "Home is not a place, it's the feeling of your arms around me.",
-        "I survived the maze of life just to find your embrace.",
-        "The best gift you can give me is a tight hug that lasts forever.",
-        "My favorite place in the universe? Right next to you.",
-        "Through every gloom and every fear, I choose you.",
-        "You are the pause button on my chaotic life.",
-        "Let's stay tangled in a hug until the world ends.",
-        "Your heartbeat is the rhythm I want to fall asleep to.",
-        "Nothing feels as safe as being held by you.",
-        "I gathered all this love just to give it to you.",
-        "A hug is a handshake from the heart, and my heart is yours.",
-        "You are the warmth in my coldest winters.",
-        "Here's to a lifetime of hugs, laughter, and us."
-    ];
-
-    function countMaxScore() {
-        let total = 0;
-        layout.forEach(cell => {
-            if(cell === 0) total += 1;
-            if(cell === 3) total += 50;
-        });
-        return total;
-    }
-
-    function shuffleQuotes(pool, count) {
-        let shuffled = [...pool].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, count);
-    }
-    
-    // Ghosts with prevIndex for tracking swaps
+    // Data must be defined BEFORE Init
     let ghosts = [
         { name: 'blinky', index: 348, prevIndex: 348, speed: 130, timer: 0, scared: false, start: 348, currentDir: -1, color: '#ff1744', displayName: 'STRESS', icon: '😡' },
         { name: 'pinky', index: 376, prevIndex: 376, speed: 180, timer: 0, scared: false, start: 376, currentDir: -1, color: '#ff6ec7', displayName: 'ANXIETY', icon: '😰' },
         { name: 'inky', index: 351, prevIndex: 351, speed: 220, timer: 0, scared: false, start: 351, currentDir: 1, color: '#9c27b0', displayName: 'DOUBT', icon: '😵‍💫' },
         { name: 'clyde', index: 379, prevIndex: 379, speed: 280, timer: 0, scared: false, start: 379, currentDir: 1, color: '#00bcd4', displayName: 'LONELINESS', icon: '🥺' }
     ];
+
+    let pacman = { index: 490, prevIndex: 490, dir: 1, nextDir: 1 };
+    let squares = [];
+    let score = 0;
+    let winningScore = 0;
+    let gameActive = false;
+    let audioContext = null;
+    let currentSessionQuotes = [];
+
+    const powerupQuotes = [
+        "Imagine me grabbing your bum while we kiss", "Imagine us kissing in the rain",
+        "Imagine us cuddling in a thunderstorm", "I want to wake up next to you daily",
+        "Your laugh is my favorite sound", "You are my safe space",
+        "Every love song is about you", "I'd choose you in a hundred lifetimes",
+        "Imagine dancing to jazz in the kitchen", "You make the gloomy days sunny",
+        "I am so addicted to you", "Imagine holding hands on an old street",
+        "My heart beats faster near you", "You are the best thing ever",
+        "I love you more than pizza", "Imagine a lazy Sunday in sheets",
+        "You are my home", "I just want to hold you tight",
+        "Even when I'm angry, I love you", "Imagine us growing old flirting",
+        "You're the peanut butter to my jelly", "I love it when you smile at me",
+        "Imagine late night drives holding hands", "You smell like home",
+        "I crave your touch constantly", "You are my favorite distraction",
+        "I love you to the moon and back", "You are my happy place",
+        "Imagine us star gazing on a hill", "I love the way you look at me",
+        "You're my dream come true", "Imagine breakfast in bed together",
+        "I want to steal your hoodies", "You're sweeter than chocolate",
+        "I get butterflies seeing you", "Imagine us adopting a puppy",
+        "I never want to stop making memories", "Your voice calms my soul",
+        "I love your warm hugs", "You are my forever plus one"
+    ];
+
+    const finaleQuotes = [
+        "No matter how bad the situations are, love always finds a way. I love your hugs.",
+        "In your arms is the only place I want to be.", "A hug from you mends all my broken pieces.",
+        "Distance means nothing when one hug can change everything.", "I would fight the world just to end the day in your arms.",
+        "Your hugs are my anchor in this stormy world.", "One hug from you wipes away a thousand worries.",
+        "Home is not a place, it's the feeling of your arms around me.", "I survived the maze of life just to find your embrace.",
+        "The best gift you can give me is a tight hug that lasts forever.", "My favorite place in the universe? Right next to you.",
+        "Through every gloom and every fear, I choose you.", "You are the pause button on my chaotic life.",
+        "Let's stay tangled in a hug until the world ends.", "Your heartbeat is the rhythm I want to fall asleep to.",
+        "Nothing feels as safe as being held by you.", "I gathered all this love just to give it to you.",
+        "A hug is a handshake from the heart, and my heart is yours.", "You are the warmth in my coldest winters.",
+        "Here's to a lifetime of hugs, laughter, and us."
+    ];
+
+    // --- GAME ENGINE ---
     
     function displayEnemiesOnTitle() {
         const enemiesDisplay = document.getElementById('enemies-display');
@@ -512,132 +316,147 @@
         let html = '<div style="margin-bottom: 8px; color: #ff007f;">THE GLOOMS:</div>';
         ghosts.forEach(g => {
             html += `<div style="margin: 4px 0; color: ${g.color}; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <span style="font-size: 14px;">${g.icon}</span> <span>${g.displayName}</span>
+                        <span>${g.icon}</span> <span>${g.displayName}</span>
                      </div>`;
         });
         enemiesDisplay.innerHTML = html;
     }
 
-    displayEnemiesOnTitle();
-    
     function init() {
-        const availableHeight = window.innerHeight * 0.7; 
+        const availableHeight = window.innerHeight * 0.65;
         const availableWidth = window.innerWidth * 0.95;
         let scale = Math.min(availableWidth / (width * TILE_SIZE), availableHeight / (width * TILE_SIZE));
         canvas.width = width * TILE_SIZE * scale;
         canvas.height = width * TILE_SIZE * scale;
         ctx.scale(scale, scale);
-        
-        winningScore = countMaxScore();
+
+        winningScore = 0;
+        squares = [];
+        layout.forEach(cell => {
+            if(cell === 0) winningScore++;
+            if(cell === 3) winningScore+=50;
+        });
         targetEl.innerText = winningScore;
-        currentSessionQuotes = shuffleQuotes(powerupQuotes, 4); 
+        currentSessionQuotes = [...powerupQuotes].sort(() => 0.5 - Math.random()).slice(0, 4);
         
         drawBoard();
     }
 
+    // --- SYNTHWAVE AUDIO ENGINE (Code Generated = 100% Reliable) ---
+    function playMusic() {
+        if(!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        const bpm = 130;
+        const noteDuration = 60 / bpm;
+        let nextNoteTime = audioContext.currentTime;
+
+        // Bassline Notes (Retro Arpeggio)
+        const bassNotes = [65.41, 65.41, 77.78, 77.78, 87.31, 87.31, 98.00, 98.00]; // C2, Eb2, F2, G2
+        let noteIndex = 0;
+
+        function scheduler() {
+            while (nextNoteTime < audioContext.currentTime + 0.1) {
+                playNote(bassNotes[noteIndex % bassNotes.length], nextNoteTime);
+                nextNoteTime += noteDuration / 2; // 8th notes
+                noteIndex++;
+            }
+            if(gameActive) setTimeout(scheduler, 25);
+        }
+
+        function playNote(freq, time) {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.value = freq;
+            
+            // Lowpass filter for "muffled" retro sound
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 800;
+
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioContext.destination);
+
+            gain.gain.setValueAtTime(0.1, time);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.2);
+
+            osc.start(time);
+            osc.stop(time + 0.2);
+        }
+        scheduler();
+    }
+
+    // --- GAME LOOP ---
     function gameLoop() {
         if (!gameActive) return;
 
-        // --- PACMAN MOVEMENT ---
-        let nextMove = pacman.index + pacman.nextDir;
-        if(layout[nextMove] !== 1 && layout[nextMove] !== 2) {
-            pacman.dir = pacman.nextDir;
-        }
-        let moveIdx = pacman.index + pacman.dir;
+        // Pacman Move
+        let moveIdx = pacman.index + pacman.nextDir;
+        if(layout[moveIdx] !== 1 && layout[moveIdx] !== 2) pacman.dir = pacman.nextDir;
         
+        moveIdx = pacman.index + pacman.dir;
         if (layout[moveIdx] !== 1 && layout[moveIdx] !== 2) {
-            pacman.prevIndex = pacman.index; // Track previous position
+            pacman.prevIndex = pacman.index;
             pacman.index = moveIdx;
         }
 
+        // Tunnel
         if(pacman.index === 392) pacman.index = 419;
         else if(pacman.index === 419) pacman.index = 392;
 
+        // Eat
         if (layout[pacman.index] === 0 && !squares[pacman.index]) {
-            score++;
-            squares[pacman.index] = true;
+            score++; squares[pacman.index] = true;
             scoreEl.innerText = score;
         } else if (layout[pacman.index] === 3 && !squares[pacman.index]) {
-            score += 50;
-            squares[pacman.index] = true;
+            score += 50; squares[pacman.index] = true;
             scoreEl.innerText = score;
-            
-            if(currentSessionQuotes.length > 0) {
-                showHugQuote(currentSessionQuotes.pop());
-            } else {
-                showHugQuote("Bonus Love!");
-            }
-            
+            let qt = currentSessionQuotes.length > 0 ? currentSessionQuotes.pop() : "Bonus Love!";
+            showHugQuote(qt);
             ghosts.forEach(g => g.scared = true);
             setTimeout(() => ghosts.forEach(g => g.scared = false), 10000);
-            if(navigator.vibrate) navigator.vibrate(20);
+            if(navigator.vibrate) navigator.vibrate(50);
         }
 
         if (score >= winningScore) { endGame(true); return; }
 
-        // --- GHOST AI ---
+        // Ghost AI
         ghosts.forEach(ghost => {
             ghost.timer++;
-            let moveThreshold = ghost.scared ? 12 : (ghost.name === 'blinky' ? 4 : 6); 
-            
-            if (ghost.timer > moveThreshold) {
+            let thresh = ghost.scared ? 12 : (ghost.name === 'blinky' ? 4 : 6);
+            if(ghost.timer > thresh) {
                 ghost.timer = 0;
-                
-                const possibleMoves = [-1, 1, -width, width];
-                let validMoves = possibleMoves.filter(dir => {
-                    let next = ghost.index + dir;
-                    if(layout[next] === 1) return false;
-                    if (!ghost.scared && dir === -ghost.currentDir) return false;
-                    return true;
+                const moves = [-1, 1, -width, width].filter(d => {
+                    let next = ghost.index + d;
+                    return layout[next] !== 1 && (ghost.scared || d !== -ghost.currentDir);
                 });
 
-                if(validMoves.length === 0) {
-                     validMoves = possibleMoves.filter(dir => {
-                        let next = ghost.index + dir;
-                        return layout[next] !== 1;
-                     });
-                }
-
-                if (validMoves.length > 0) {
-                    let bestDir = validMoves[Math.floor(Math.random() * validMoves.length)];
-                    
-                    if (!ghost.scared) {
-                        let target = pacman.index;
-                        if (ghost.name === 'pinky') target = pacman.index + (pacman.dir * 4);
-                        
-                        let minDst = Infinity;
-                        validMoves.forEach(dir => {
-                            let c1 = { x: (ghost.index + dir) % width, y: Math.floor((ghost.index + dir) / width) };
-                            let c2 = { x: target % width, y: Math.floor(target / width) };
-                            let dst = Math.sqrt(Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2));
-                            if (dst < minDst) { minDst = dst; bestDir = dir; }
+                if(moves.length > 0) {
+                    let best = moves[0];
+                    if(!ghost.scared) {
+                        let t = pacman.index; // Targeting
+                        let min = Infinity;
+                        moves.forEach(d => {
+                            let tx = t % width, ty = Math.floor(t / width);
+                            let gx = (ghost.index+d) % width, gy = Math.floor((ghost.index+d)/width);
+                            let dst = Math.sqrt((tx-gx)**2 + (ty-gy)**2);
+                            if(dst < min) { min = dst; best = d; }
                         });
                     } else {
-                        let maxDst = -1;
-                        validMoves.forEach(dir => {
-                            let c1 = { x: (ghost.index + dir) % width, y: Math.floor((ghost.index + dir) / width) };
-                            let c2 = { x: pacman.index % width, y: Math.floor(pacman.index / width) };
-                            let dst = Math.sqrt(Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2));
-                            if (dst > maxDst) { maxDst = dst; bestDir = dir; }
-                        });
+                        best = moves[Math.floor(Math.random() * moves.length)];
                     }
-                    
-                    ghost.prevIndex = ghost.index; // Track previous position
-                    ghost.index += bestDir;
-                    ghost.currentDir = bestDir;
+                    ghost.prevIndex = ghost.index;
+                    ghost.index += best;
+                    ghost.currentDir = best;
                 }
             }
 
-            // --- IMPROVED COLLISION DETECTION ---
-            // 1. Direct overlap
-            // 2. Swapped positions (Pass-through fix)
-            let collision = (ghost.index === pacman.index) || 
-                            (ghost.prevIndex === pacman.index && ghost.index === pacman.prevIndex);
-            
-            if (collision) {
-                if (ghost.scared) {
+            // COLLISION CHECK (Swapping logic fixes pass-through bug)
+            if (ghost.index === pacman.index || (ghost.index === pacman.prevIndex && ghost.prevIndex === pacman.index)) {
+                if(ghost.scared) {
                     ghost.index = ghost.start;
-                    ghost.prevIndex = ghost.start;
+                    score += 100; scoreEl.innerText = score;
                 } else {
                     endGame(false);
                 }
@@ -645,84 +464,47 @@
         });
 
         drawBoard();
-        setTimeout(() => requestAnimationFrame(gameLoop), 50); 
+        setTimeout(() => requestAnimationFrame(gameLoop), 50);
     }
 
     function drawBoard() {
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, width*TILE_SIZE, width*TILE_SIZE);
-        
-        layout.forEach((cell, i) => {
-            let x = (i % width) * TILE_SIZE;
-            let y = Math.floor(i / width) * TILE_SIZE;
-            
-            if (cell === 1) { 
-                ctx.fillStyle = '#1a1a3e';
-                ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                ctx.strokeStyle = '#334155';
-                ctx.strokeRect(x,y,TILE_SIZE,TILE_SIZE);
-                ctx.strokeStyle = '#ff007f';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(x+5,y+5,TILE_SIZE-10,TILE_SIZE-10);
-            } else if (cell === 0 && !squares[i]) { 
-                ctx.fillStyle = '#fbcfe8';
-                ctx.beginPath();
-                ctx.arc(x+10, y+10, 2, 0, Math.PI*2);
-                ctx.fill();
-            } else if (cell === 3 && !squares[i]) { 
-                ctx.fillStyle = '#ff007f';
-                ctx.shadowColor = '#ff007f';
-                ctx.shadowBlur = 10;
-                ctx.beginPath();
-                ctx.arc(x+10, y+10, 5, 0, Math.PI*2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
+        ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
+        layout.forEach((c, i) => {
+            let x = (i%width)*TILE_SIZE, y = Math.floor(i/width)*TILE_SIZE;
+            if(c===1) {
+                ctx.fillStyle = '#1a1a3e'; ctx.fillRect(x,y,TILE_SIZE,TILE_SIZE);
+                ctx.strokeStyle = '#ff007f'; ctx.lineWidth=1; ctx.strokeRect(x+4,y+4,TILE_SIZE-8,TILE_SIZE-8);
+            } else if(c===0 && !squares[i]) {
+                ctx.fillStyle = '#fbcfe8'; ctx.beginPath(); ctx.arc(x+10,y+10,2,0,6.28); ctx.fill();
+            } else if(c===3 && !squares[i]) {
+                ctx.fillStyle = '#ff007f'; ctx.beginPath(); ctx.arc(x+10,y+10,6,0,6.28); ctx.fill();
             }
         });
 
-        let px = (pacman.index % width) * TILE_SIZE + 10;
-        let py = Math.floor(pacman.index / width) * TILE_SIZE + 10;
-        ctx.save();
-        ctx.translate(px, py);
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = '#ff3366';
-        ctx.font = "20px 'Segoe UI Emoji', Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText('❤️', 0, 2);
-        ctx.restore();
+        // Player
+        let px = (pacman.index%width)*TILE_SIZE+10, py = Math.floor(pacman.index/width)*TILE_SIZE+10;
+        ctx.font = "20px Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
+        ctx.fillText('❤️', px, py+2);
 
+        // Ghosts
         ghosts.forEach(g => {
-            let gx = (g.index % width) * TILE_SIZE + 10;
-            let gy = Math.floor(g.index / width) * TILE_SIZE + 10;
-            
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = g.color;
-            ctx.font = "20px 'Segoe UI Emoji', Arial";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            
-            let emoji = g.scared ? '🫥' : g.icon;
-            ctx.fillText(emoji, gx, gy + 2);
-            ctx.shadowBlur = 0;
+            let gx = (g.index%width)*TILE_SIZE+10, gy = Math.floor(g.index/width)*TILE_SIZE+10;
+            ctx.fillText(g.scared ? '🫥' : g.icon, gx, gy+2);
         });
     }
 
     function showHugQuote(text) {
-        quotePopup.innerHTML = text;
+        quotePopup.innerText = text;
         quotePopup.classList.add('visible');
-        setTimeout(() => {
-            quotePopup.classList.remove('visible');
-        }, 3000);
+        setTimeout(() => quotePopup.classList.remove('visible'), 3000);
     }
 
     function endGame(win) {
         gameActive = false;
         if(win) {
-            const finalQuote = finaleQuotes[Math.floor(Math.random() * finaleQuotes.length)];
-            finalQuoteContainer.innerHTML = `"${finalQuote}"`;
-            
             finaleScreen.classList.remove('hidden');
+            let q = finaleQuotes[Math.floor(Math.random()*finaleQuotes.length)];
+            finalQuoteContainer.innerText = `"${q}"`;
             if(navigator.vibrate) navigator.vibrate([100,50,100]);
         } else {
             gameOverScreen.classList.remove('hidden');
@@ -730,24 +512,19 @@
         }
     }
 
+    // Input
     document.addEventListener('keydown', e => {
-        if(e.key === 'ArrowLeft' || e.key === 'a') pacman.nextDir = -1;
-        if(e.key === 'ArrowRight' || e.key === 'd') pacman.nextDir = 1;
-        if(e.key === 'ArrowUp' || e.key === 'w') pacman.nextDir = -width;
-        if(e.key === 'ArrowDown' || e.key === 's') pacman.nextDir = width;
+        if(e.key.includes('Left')) pacman.nextDir = -1;
+        if(e.key.includes('Right')) pacman.nextDir = 1;
+        if(e.key.includes('Up')) pacman.nextDir = -width;
+        if(e.key.includes('Down')) pacman.nextDir = width;
     });
 
-    let tsX, tsY;
-    document.addEventListener('touchstart', e => { 
-        e.preventDefault(); // Stop scrolling on swipe
-        tsX = e.touches[0].clientX; 
-        tsY = e.touches[0].clientY; 
-    }, {passive: false});
-    
+    let tx, ty;
+    document.addEventListener('touchstart', e => { e.preventDefault(); tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, {passive: false});
     document.addEventListener('touchend', e => {
-        let dx = e.changedTouches[0].clientX - tsX;
-        let dy = e.changedTouches[0].clientY - tsY;
-        if (Math.abs(dx) > 30 || Math.abs(dy) > 30) { // Increased threshold slightly
+        let dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+        if(Math.abs(dx)>20 || Math.abs(dy)>20) {
             if(Math.abs(dx) > Math.abs(dy)) pacman.nextDir = dx > 0 ? 1 : -1;
             else pacman.nextDir = dy > 0 ? width : -width;
         }
@@ -755,14 +532,17 @@
 
     document.getElementById('start-btn').addEventListener('click', () => {
         startScreen.classList.add('hidden');
-        musicAudio.play().catch(e => console.log("Audio play failed interaction required"));
-        init();
+        displayEnemiesOnTitle(); // Init visuals
+        playMusic(); // Start Audio
+        init(); // Start Game
         gameActive = true;
         gameLoop();
     });
 
     window.addEventListener('resize', () => { if(gameActive) init(); });
+    
+    // Init enemies display on load
+    displayEnemiesOnTitle();
 </script>
-
 </body>
 </html>
