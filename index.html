@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HEARTMAN: AAA Hug Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Orbitron:wght@400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <title>HEARTMAN: Ultimate Retrowave Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Montserrat:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-pink: #ff007f;
-            --neon-cyan: #00ffff;
-            --glass-bg: rgba(255, 255, 255, 0.03);
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --bg-dark: #050510;
+            --glass: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --accent-gradient: linear-gradient(45deg, #ff007f, #7000ff);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
-            background: #050505;
+            background-color: var(--bg-dark);
             color: #fff;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             height: 100vh;
             height: 100dvh;
             overflow: hidden;
@@ -29,70 +30,93 @@
             touch-action: none;
         }
 
-        #app-container {
-            position: relative;
+        /* Background Retrowave Grid */
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom, #050510 0%, #20002c 100%);
+            z-index: -1;
+        }
+        .grid-lines {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            bottom: -50%;
+            left: -50%;
+            background-image: 
+                linear-gradient(rgba(255, 0, 127, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 127, 0.2) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: perspective(500px) rotateX(60deg);
+            animation: gridMove 2s linear infinite;
+        }
+        @keyframes gridMove {
+            from { background-position: 0 0; }
+            to { background-position: 0 50px; }
+        }
+
+        #app {
             width: 100%;
-            max-width: 500px;
+            max-width: 450px;
             height: 100%;
             display: flex;
             flex-direction: column;
-            background: radial-gradient(circle at 50% 0%, #1a0010 0%, #050505 100%);
             padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
+            position: relative;
         }
 
-        /* Glassmorphism UI */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+        /* AAA Glassmorphism UI */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 15px 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
 
         header {
-            height: 80px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
             margin-top: 10px;
+            margin-bottom: 20px;
         }
 
-        .stat-box {
+        .stat {
             text-align: center;
         }
-
         .stat-label {
-            font-size: 10px;
             font-family: 'Orbitron';
-            color: rgba(255, 255, 255, 0.5);
+            font-size: 9px;
+            color: var(--neon-blue);
             letter-spacing: 2px;
-            margin-bottom: 4px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
         }
-
         .stat-value {
-            font-size: 18px;
             font-family: 'Orbitron';
+            font-size: 20px;
             font-weight: 900;
-            color: var(--neon-pink);
-            text-shadow: 0 0 10px var(--neon-pink);
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-blue);
         }
 
-        #game-viewport {
+        #game-container {
             flex: 1;
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
-            margin: 20px 0;
+            border-radius: 20px;
+            overflow: hidden;
         }
 
         canvas {
             max-width: 100%;
             max-height: 100%;
-            border-radius: 16px;
-            box-shadow: 0 0 40px rgba(255, 0, 127, 0.2);
+            border-radius: 12px;
+            filter: drop-shadow(0 0 20px rgba(255, 0, 127, 0.3));
         }
 
         /* Overlays */
@@ -104,157 +128,155 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px;
+            background: rgba(5, 5, 16, 0.9);
+            backdrop-filter: blur(10px);
             text-align: center;
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 30px;
+            transition: opacity 0.5s ease;
         }
+        .hidden { opacity: 0; pointer-events: none; }
 
-        .hidden { opacity: 0; visibility: hidden; transform: scale(1.1); }
-
-        .title-text {
+        .title {
             font-family: 'Orbitron';
-            font-size: 42px;
+            font-size: 48px;
             font-weight: 900;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--neon-pink);
+            text-shadow: 0 0 20px var(--neon-pink);
             margin-bottom: 10px;
         }
+        .subtitle {
+            font-size: 14px;
+            color: var(--neon-blue);
+            letter-spacing: 4px;
+            margin-bottom: 40px;
+        }
 
-        .btn-primary {
-            padding: 18px 48px;
-            background: var(--accent-gradient);
+        .btn {
+            padding: 16px 40px;
+            background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
             border: none;
-            border-radius: 100px;
+            border-radius: 50px;
             color: #fff;
             font-family: 'Orbitron';
             font-weight: 700;
             font-size: 14px;
             letter-spacing: 2px;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(255, 0, 127, 0.3);
-            transition: transform 0.2s;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
+        .btn:active { transform: scale(0.95); }
 
-        .btn-primary:active { transform: scale(0.95); }
-
-        /* Win Sequence Styles */
-        #win-overlay {
-            background: #000;
+        /* Win Screen Love Letter */
+        #win-screen {
+            background: radial-gradient(circle at center, #20002c 0%, #050510 100%);
             overflow-y: auto;
             display: block;
-            padding: 60px 30px;
+            padding: 60px 20px;
         }
-
-        .love-letter-content {
-            max-width: 400px;
+        .letter-content {
+            max-width: 380px;
             margin: 0 auto;
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(20px);
             transition: all 1s ease 0.5s;
         }
-
-        #win-overlay.active .love-letter-content {
+        #win-screen:not(.hidden) .letter-content {
             opacity: 1;
             transform: translateY(0);
         }
-
-        .love-letter-content h2 {
+        .letter-content h2 {
             font-family: 'Orbitron';
             color: var(--neon-pink);
-            margin-bottom: 30px;
             font-size: 24px;
+            margin-bottom: 30px;
         }
-
-        .love-letter-content p {
-            font-size: 18px;
+        .letter-content p {
+            font-size: 17px;
             line-height: 1.8;
-            color: #ccc;
-            margin-bottom: 24px;
+            color: #e0e0e0;
+            margin-bottom: 20px;
             font-weight: 300;
         }
 
-        .floating-hearts {
+        .heart-float {
             position: absolute;
-            inset: 0;
             pointer-events: none;
+            animation: heartFloat 4s ease-in infinite;
+            opacity: 0;
+        }
+        @keyframes heartFloat {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translateY(-20vh) scale(1.5); opacity: 0; }
         }
 
-        .heart-particle {
-            position: absolute;
-            color: var(--neon-pink);
-            animation: floatUp 4s linear infinite;
-        }
-
-        @keyframes floatUp {
-            from { transform: translateY(100vh) scale(0); opacity: 1; }
-            to { transform: translateY(-10vh) scale(1.5); opacity: 0; }
-        }
-
-        .joystick-hint {
+        .hint {
+            margin-top: 30px;
             font-size: 10px;
             color: rgba(255, 255, 255, 0.3);
-            font-family: 'Press Start 2P';
-            margin-top: 20px;
+            letter-spacing: 2px;
         }
     </style>
 </head>
 <body>
 
-<div id="app-container">
-    <header class="glass-panel">
-        <div class="stat-box">
-            <div class="stat-label">SCORE</div>
-            <div id="score-val" class="stat-value">0</div>
+<div class="grid-bg"><div class="grid-lines"></div></div>
+
+<div id="app">
+    <header class="glass-card">
+        <div class="stat">
+            <div class="stat-label">HEARTS</div>
+            <div id="score" class="stat-value">0</div>
         </div>
-        <div class="stat-box">
+        <div class="stat">
             <div class="stat-label">GOAL</div>
-            <div id="goal-val" class="stat-value">0</div>
+            <div id="goal" class="stat-value">0</div>
         </div>
     </header>
 
-    <div id="game-viewport">
-        <canvas id="gameCanvas"></canvas>
-        
-        <!-- Start Screen -->
+    <div id="game-container">
+        <canvas id="canvas"></canvas>
+
+        <!-- Start Overlay -->
         <div id="start-overlay" class="overlay">
-            <h1 class="title-text">HEARTMAN</h1>
-            <p style="color: #888; margin-bottom: 40px; font-size: 14px;">A Love Story in Motion</p>
-            <button id="start-btn" class="btn-primary">BEGIN JOURNEY</button>
-            <p class="joystick-hint">SWIPE TO NAVIGATE</p>
+            <h1 class="title">HEARTMAN</h1>
+            <p class="subtitle">ULTIMATE EDITION</p>
+            <button id="start-btn" class="btn">START MISSION</button>
+            <p class="hint">SWIPE TO MOVE • COLLECT ALL HEARTS</p>
         </div>
 
-        <!-- Win Screen -->
-        <div id="win-overlay" class="overlay hidden">
-            <div class="floating-hearts" id="heart-container"></div>
-            <div class="love-letter-content">
-                <div style="font-size: 60px; margin-bottom: 20px;">â¤ï¸</div>
+        <!-- Win Overlay -->
+        <div id="win-screen" class="overlay hidden">
+            <div id="hearts-container"></div>
+            <div class="letter-content">
+                <div style="font-size: 50px; margin-bottom: 20px;">💖</div>
                 <h2>I Love You So Much</h2>
                 <p>You bring so much value and meaning to my life. Every challenge we face is just another level we'll beat together.</p>
                 <p>Love will always find a way through any difficult situation. I miss your hug more than words can express.</p>
                 <p>Your hug heals the inner child in me. It's my safe harbor in every storm.</p>
-                <button onclick="location.reload()" class="btn-primary" style="margin-top: 40px;">REPLAY LOVE</button>
+                <button onclick="location.reload()" class="btn" style="margin-top: 30px;">REPLAY LOVE</button>
             </div>
         </div>
     </div>
 
-    <footer style="height: 60px; display: flex; justify-content: center; align-items: center;">
-        <div style="width: 40px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;"></div>
+    <footer style="height: 40px; display: flex; justify-content: center; align-items: center;">
+        <div style="width: 40px; height: 4px; background: var(--glass-border); border-radius: 2px;"></div>
     </footer>
 </div>
 
 <script>
-    const canvas = document.getElementById('gameCanvas');
+    const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
-    const scoreEl = document.getElementById('score-val');
-    const goalEl = document.getElementById('goal-val');
+    const scoreEl = document.getElementById('score');
+    const goalEl = document.getElementById('goal');
+
+    // Game Constants
+    const TILE = 20;
+    const COLS = 19;
+    const ROWS = 21;
     
-    // Game Config
-    const TILE_SIZE = 20;
-    const GRID_W = 19;
-    const GRID_H = 23;
-    
-    // 1 = Wall, 0 = Dot, 3 = Power, 2 = Ghost House (Closed)
+    // 1: Wall, 0: Heart, 3: Power, 2: Ghost House
     const maze = [
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
         1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,
@@ -265,7 +287,7 @@
         1,1,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,1,1,
         1,1,1,1,0,1,0,0,0,0,0,0,0,1,0,1,1,1,1,
         1,1,1,1,0,1,0,1,1,2,1,1,0,1,0,1,1,1,1,
-        0,0,0,0,0,0,0,1,2,2,2,1,0,0,0,0,0,0,0,
+        1,0,0,0,0,0,0,1,2,2,2,1,0,0,0,0,0,0,1,
         1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1,
         1,1,1,1,0,1,0,0,0,0,0,0,0,1,0,1,1,1,1,
         1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1,
@@ -280,101 +302,96 @@
     ];
 
     let state = {
-        score: 0,
-        dots: 0,
         active: false,
-        powerMode: 0,
-        pacman: { x: 9, y: 15, dir: {x:0, y:0}, nextDir: {x:0, y:0}, anim: 0 },
+        score: 0,
+        total: 0,
+        power: 0,
+        player: { x: 9, y: 15, dx: 0, dy: 0, nextDx: 0, nextDy: 0 },
         ghosts: [
-            { x: 9, y: 9, color: '#ff0033', speed: 0.08, dir: {x:1, y:0}, mode: 'chase' },
-            { x: 8, y: 9, color: '#ffb8ff', speed: 0.07, dir: {x:-1, y:0}, mode: 'chase' },
-            { x: 10, y: 9, color: '#00ffff', speed: 0.06, dir: {x:0, y:-1}, mode: 'chase' }
+            { x: 9, y: 9, color: '#ff007f', speed: 0.08, dx: 1, dy: 0 },
+            { x: 8, y: 9, color: '#00f2ff', speed: 0.07, dx: -1, dy: 0 },
+            { x: 10, y: 9, color: '#bc13fe', speed: 0.06, dx: 0, dy: -1 }
         ],
         eaten: new Set()
     };
 
     function init() {
-        const size = Math.min(window.innerWidth - 40, (window.innerHeight - 200));
-        const scale = size / (GRID_W * TILE_SIZE);
-        canvas.width = GRID_W * TILE_SIZE * scale;
-        canvas.height = GRID_H * TILE_SIZE * scale;
+        const size = Math.min(window.innerWidth - 40, window.innerHeight - 250);
+        const scale = size / (COLS * TILE);
+        canvas.width = COLS * TILE * scale;
+        canvas.height = ROWS * TILE * scale;
         ctx.scale(scale, scale);
         
-        state.dots = maze.filter(t => t === 0 || t === 3).length;
-        goalEl.innerText = state.dots;
+        state.total = maze.filter(t => t === 0 || t === 3).length;
+        goalEl.innerText = state.total;
         render();
     }
 
     function getTile(x, y) {
         const tx = Math.floor(x);
         const ty = Math.floor(y);
-        if (tx < 0 || tx >= GRID_W || ty < 0 || ty >= GRID_H) return 1;
-        return maze[ty * GRID_W + tx];
+        if (tx < 0 || tx >= COLS || ty < 0 || ty >= ROWS) return 1;
+        return maze[ty * COLS + tx];
     }
 
     function update() {
         if (!state.active) return;
 
-        // Pacman Movement
-        const p = state.pacman;
+        const p = state.player;
         
-        // Try change direction at tile centers
+        // Player Movement Logic
         if (Number.isInteger(p.x) && Number.isInteger(p.y)) {
-            if (getTile(p.x + p.nextDir.x, p.y + p.nextDir.y) !== 1) {
-                p.dir = {...p.nextDir};
+            if (getTile(p.x + p.nextDx, p.y + p.nextDy) !== 1) {
+                p.dx = p.nextDx; p.dy = p.nextDy;
             }
-            if (getTile(p.x + p.dir.x, p.y + p.dir.y) === 1) {
-                p.dir = {x:0, y:0};
+            if (getTile(p.x + p.dx, p.y + p.dy) === 1) {
+                p.dx = 0; p.dy = 0;
             }
             
-            // Eat
-            const idx = Math.floor(p.y) * GRID_W + Math.floor(p.x);
+            // Eating
+            const idx = p.y * COLS + p.x;
             if (!state.eaten.has(idx)) {
                 if (maze[idx] === 0 || maze[idx] === 3) {
                     state.eaten.add(idx);
                     state.score++;
                     scoreEl.innerText = state.score;
-                    playSfx(440 + (state.score % 10) * 20, 0.05);
+                    playBeep(440 + (state.score % 8) * 50, 0.05);
                     if (maze[idx] === 3) {
-                        state.powerMode = 400;
-                        playSfx(880, 0.2);
+                        state.power = 400;
+                        playBeep(880, 0.2);
                     }
-                    if (state.score >= state.dots) win();
+                    if (state.score >= state.total) win();
                 }
             }
         }
 
-        p.x = Math.round((p.x + p.dir.x * 0.15) * 100) / 100;
-        p.y = Math.round((p.y + p.dir.y * 0.15) * 100) / 100;
-        
-        // Wrap around
-        if (p.x < 0) p.x = GRID_W - 1;
-        if (p.x >= GRID_W) p.x = 0;
+        p.x = Math.round((p.x + p.dx * 0.15) * 100) / 100;
+        p.y = Math.round((p.y + p.dy * 0.15) * 100) / 100;
 
-        // Ghost AI (Smart Chase)
+        // Ghost AI Logic
         state.ghosts.forEach(g => {
             if (Number.isInteger(g.x) && Number.isInteger(g.y)) {
-                const moves = [{x:1,y:0}, {x:-1,y:0}, {x:0,y:1}, {x:0,y:-1}];
-                const valid = moves.filter(m => getTile(g.x + m.x, g.y + m.y) !== 1 && (m.x !== -g.dir.x || m.y !== -g.dir.y));
+                const moves = [{dx:1,dy:0}, {dx:-1,dy:0}, {dx:0,dy:1}, {dx:0,dy:-1}];
+                const valid = moves.filter(m => getTile(g.x + m.dx, g.y + m.dy) !== 1 && (m.dx !== -g.dx || m.dy !== -g.dy));
                 
                 if (valid.length > 0) {
-                    // Target Pacman
+                    // Smart Chase: Sort by distance to player
                     valid.sort((a, b) => {
-                        const distA = Math.hypot(g.x + a.x - p.x, g.y + a.y - p.y);
-                        const distB = Math.hypot(g.x + b.x - p.x, g.y + b.y - p.y);
-                        return state.powerMode > 0 ? distB - distA : distA - distB;
+                        const distA = Math.hypot(g.x + a.dx - p.x, g.y + a.dy - p.y);
+                        const distB = Math.hypot(g.x + b.dx - p.x, g.y + b.dy - p.y);
+                        return state.power > 0 ? distB - distA : distA - distB;
                     });
-                    g.dir = valid[0];
+                    g.dx = valid[0].dx; g.dy = valid[0].dy;
                 } else {
-                    g.dir = {x: -g.dir.x, y: -g.dir.y};
+                    g.dx = -g.dx; g.dy = -g.dy;
                 }
             }
-            g.x = Math.round((g.x + g.dir.x * g.speed) * 100) / 100;
-            g.y = Math.round((g.y + g.dir.y * g.speed) * 100) / 100;
+            g.x = Math.round((g.x + g.dx * g.speed) * 100) / 100;
+            g.y = Math.round((g.y + g.dy * g.speed) * 100) / 100;
 
             // Collision
             if (Math.hypot(g.x - p.x, g.y - p.y) < 0.6) {
-                if (state.powerMode > 0) {
+                if (state.power > 0) {
                     g.x = 9; g.y = 9;
                     state.score += 10;
                 } else {
@@ -383,92 +400,118 @@
             }
         });
 
-        if (state.powerMode > 0) state.powerMode--;
+        if (state.power > 0) state.power--;
         render();
         requestAnimationFrame(update);
     }
 
     function render() {
-        ctx.clearRect(0, 0, GRID_W * TILE_SIZE, GRID_H * TILE_SIZE);
+        ctx.clearRect(0, 0, COLS * TILE, ROWS * TILE);
         
         // Draw Maze
         maze.forEach((t, i) => {
             if (state.eaten.has(i)) return;
-            const x = (i % GRID_W) * TILE_SIZE;
-            const y = Math.floor(i / GRID_W) * TILE_SIZE;
+            const x = (i % COLS) * TILE;
+            const y = Math.floor(i / COLS) * TILE;
             
             if (t === 1) {
                 ctx.fillStyle = '#1a1a2e';
-                ctx.fillRect(x+2, y+2, TILE_SIZE-4, TILE_SIZE-4);
+                ctx.shadowBlur = 5; ctx.shadowColor = '#ff007f';
+                ctx.fillRect(x+2, y+2, TILE-4, TILE-4);
+                ctx.shadowBlur = 0;
             } else if (t === 0) {
-                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.fillStyle = 'rgba(255,255,255,0.2)';
                 ctx.beginPath(); ctx.arc(x+10, y+10, 2, 0, 7); ctx.fill();
             } else if (t === 3) {
-                ctx.fillStyle = varColor('--neon-pink');
+                ctx.fillStyle = '#ff007f';
+                ctx.shadowBlur = 10; ctx.shadowColor = '#ff007f';
                 ctx.beginPath(); ctx.arc(x+10, y+10, 5, 0, 7); ctx.fill();
+                ctx.shadowBlur = 0;
             }
         });
 
-        // Draw Pacman
-        ctx.fillStyle = '#ffeb3b';
-        ctx.beginPath();
-        ctx.arc(state.pacman.x * TILE_SIZE + 10, state.pacman.y * TILE_SIZE + 10, 8, 0.2 * Math.PI, 1.8 * Math.PI);
-        ctx.lineTo(state.pacman.x * TILE_SIZE + 10, state.pacman.y * TILE_SIZE + 10);
-        ctx.fill();
+        // Draw Player (Heartman)
+        const px = state.player.x * TILE + 10;
+        const py = state.player.y * TILE + 10;
+        ctx.font = "16px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText('❤️', px, py);
 
-        // Draw Ghosts
+        // Draw Ghosts (Glooms)
         state.ghosts.forEach(g => {
-            ctx.fillStyle = state.powerMode > 0 ? '#2196f3' : g.color;
-            const gx = g.x * TILE_SIZE + 10;
-            const gy = g.y * TILE_SIZE + 10;
+            const gx = g.x * TILE + 10;
+            const gy = g.y * TILE + 10;
+            ctx.fillStyle = state.power > 0 ? '#2196f3' : g.color;
+            ctx.shadowBlur = 10; ctx.shadowColor = ctx.fillStyle;
             ctx.beginPath();
             ctx.arc(gx, gy, 8, Math.PI, 0);
             ctx.lineTo(gx + 8, gy + 8);
             ctx.lineTo(gx - 8, gy + 8);
             ctx.fill();
+            ctx.shadowBlur = 0;
         });
     }
 
-    function varColor(name) { return getComputedStyle(document.documentElement).getPropertyValue(name); }
-
+    // Audio Engine
     let audioCtx;
-    function playSfx(f, d) {
+    function playBeep(f, d) {
         if (!audioCtx) return;
         const o = audioCtx.createOscillator();
         const g = audioCtx.createGain();
-        o.frequency.value = f;
+        o.type = 'sine';
+        o.frequency.setValueAtTime(f, audioCtx.currentTime);
+        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
         g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + d);
         o.connect(g); g.connect(audioCtx.destination);
         o.start(); o.stop(audioCtx.currentTime + d);
     }
 
+    function startMusic() {
+        const tempo = 110;
+        const beat = 60 / tempo;
+        const bass = [55, 55, 65, 65, 48, 48, 61, 61];
+        let i = 0;
+        setInterval(() => {
+            if (!state.active) return;
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.type = 'sawtooth';
+            o.frequency.setValueAtTime(bass[i % bass.length], audioCtx.currentTime);
+            g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + beat);
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(); o.stop(audioCtx.currentTime + beat);
+            i++;
+        }, beat * 500);
+    }
+
     function win() {
         state.active = false;
-        document.getElementById('win-overlay').classList.remove('hidden');
-        document.getElementById('win-overlay').classList.add('active');
+        document.getElementById('win-screen').classList.remove('hidden');
         spawnHearts();
     }
 
     function gameOver() {
         state.active = false;
-        alert("Love never gives up! Try again.");
+        alert("Love is patient! Try again.");
         location.reload();
     }
 
     function spawnHearts() {
-        const container = document.getElementById('heart-container');
+        const container = document.getElementById('hearts-container');
         setInterval(() => {
             const h = document.createElement('div');
-            h.className = 'heart-particle';
-            h.innerHTML = 'â¤ï¸';
+            h.className = 'heart-float';
+            h.innerHTML = ['❤️','💖','💗','💓'][Math.floor(Math.random()*4)];
             h.style.left = Math.random() * 100 + '%';
-            h.style.fontSize = (Math.random() * 20 + 10) + 'px';
+            h.style.fontSize = (Math.random() * 20 + 15) + 'px';
             container.appendChild(h);
             setTimeout(() => h.remove(), 4000);
-        }, 200);
+        }, 300);
     }
 
-    // Input
+    // Input Handling
     let startX, startY;
     document.addEventListener('touchstart', e => {
         startX = e.touches[0].clientX;
@@ -478,8 +521,11 @@
         const dx = e.changedTouches[0].clientX - startX;
         const dy = e.changedTouches[0].clientY - startY;
         if (Math.abs(dx) > 30 || Math.abs(dy) > 30) {
-            if (Math.abs(dx) > Math.abs(dy)) state.pacman.nextDir = {x: dx > 0 ? 1 : -1, y: 0};
-            else state.pacman.nextDir = {x: 0, y: dy > 0 ? 1 : -1};
+            if (Math.abs(dx) > Math.abs(dy)) {
+                state.player.nextDx = dx > 0 ? 1 : -1; state.player.nextDy = 0;
+            } else {
+                state.player.nextDx = 0; state.player.nextDy = dy > 0 ? 1 : -1;
+            }
         }
     });
 
@@ -487,6 +533,7 @@
         document.getElementById('start-overlay').classList.add('hidden');
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         state.active = true;
+        startMusic();
         update();
     };
 
