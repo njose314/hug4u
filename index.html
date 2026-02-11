@@ -398,7 +398,7 @@
     <div id="start-screen">
         <div class="title-container">
             <div class="title-main">HEART<br>MAN</div>
-            <div class="title-sub">â¤ï¸ HUG DAY SPECIAL â¤ï¸</div>
+            <div class="title-sub">❤️ HUG DAY SPECIAL ❤️</div>
         </div>
         
         <div id="enemies-display" style="margin: 20px 0; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 9px; color: #00d4ff; text-shadow: 0 0 10px #00d4ff;"></div>
@@ -406,18 +406,18 @@
         <button id="start-btn">INSERT COIN</button>
         
         <div class="instructions">
-            <div class="instruction-item">â¤ï¸ = LOVE (COLLECT)</div>
-            <div class="instruction-item">ð® SWIPE TO MOVE</div>
-            <div class="instruction-item">ð» AVOID GLOOMS</div>
-            <div class="instruction-item">ð POWERUPS UNLOCK QUOTES</div>
+            <div class="instruction-item">❤️ = LOVE (COLLECT)</div>
+            <div class="instruction-item">🎮 SWIPE TO MOVE</div>
+            <div class="instruction-item">👻 AVOID GLOOMS</div>
+            <div class="instruction-item">💗 POWERUPS UNLOCK QUOTES</div>
         </div>
     </div>
 
     <div id="finale-screen">
         <div class="heart-container">
-            <div id="final-heart" class="heart-emoji">â¤ï¸</div>
-            <div id="final-partner" class="heart-emoji">ð¤</div>
-            <div id="final-hug" class="heart-emoji">ð«</div>
+            <div id="final-heart" class="heart-emoji">❤️</div>
+            <div id="final-partner" class="heart-emoji">👤</div>
+            <div id="final-hug" class="heart-emoji">🫂</div>
         </div>
         
         <div class="finale-text">
@@ -583,7 +583,7 @@
 
         if (score >= 274) { endGame(true); return; }
 
-        // --- GHOST AI (FIXED) ---
+        // --- GHOST AI ---
         ghosts.forEach(ghost => {
             ghost.timer++;
             let moveThreshold = ghost.scared ? 12 : (ghost.name === 'blinky' ? 5 : 8); 
@@ -684,123 +684,53 @@
             }
         });
 
-        // Pacman
+        // Pacman (The Heart)
         let px = (pacman.index % width) * TILE_SIZE + 10;
         let py = Math.floor(pacman.index / width) * TILE_SIZE + 10;
         ctx.save();
         ctx.translate(px, py);
         ctx.rotate(pacman.rot);
-        ctx.fillStyle = '#ff3366';
         ctx.shadowBlur = 10;
         ctx.shadowColor = '#ff3366';
         ctx.font = "16px Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText('â¤ï¸', 0, 2);
+        ctx.fillText('❤️', 0, 2);
         ctx.restore();
 
-        // Ghosts - Stress/Negative Emotions
+        // Ghosts (The Negative Emotions)
         ghosts.forEach(g => {
             let gx = (g.index % width) * TILE_SIZE + 10;
             let gy = Math.floor(g.index / width) * TILE_SIZE + 10;
-            ctx.fillStyle = g.scared ? '#38bdf8' : g.color;
-            ctx.shadowColor = ctx.fillStyle;
-            ctx.shadowBlur = 10;
             
-            if (g.name === 'blinky') {
-                // STRESS - Angry/Aggressive with sharp edges
-                ctx.fillStyle = g.scared ? '#38bdf8' : '#ff1744';
-                ctx.shadowColor = ctx.fillStyle;
-                ctx.beginPath();
-                // Jagged crown shape
-                ctx.moveTo(gx-7, gy+3);
-                ctx.lineTo(gx-5, gy-5);
-                ctx.lineTo(gx-2, gy+2);
-                ctx.lineTo(gx+2, gy-5);
-                ctx.lineTo(gx+5, gy+2);
-                ctx.lineTo(gx+7, gy-4);
-                ctx.lineTo(gx+7, gy+7);
-                ctx.lineTo(gx-7, gy+7);
-                ctx.fill();
-                // Angry eyes
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(gx-3, gy+1, 1.5, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(gx+3, gy+1, 1.5, 0, Math.PI*2);
-                ctx.fill();
-            } else if (g.name === 'pinky') {
-                // ANXIETY - Wavy/Trembling shape
-                ctx.fillStyle = g.scared ? '#38bdf8' : '#ff6ec7';
-                ctx.shadowColor = ctx.fillStyle;
-                ctx.beginPath();
-                // Wavy edges
-                ctx.moveTo(gx-7, gy+4);
-                for (let i = -7; i <= 7; i += 2) {
-                    let wave = Math.sin(i * 0.5) * 2;
-                    ctx.lineTo(gx+i, gy-3+wave);
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = g.color;
+            ctx.font = "16px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            
+            let emoji = '';
+            
+            if (g.scared) {
+                emoji = '😱'; // Scared
+            } else {
+                switch(g.name) {
+                    case 'blinky': // Stress
+                        emoji = '😡';
+                        break;
+                    case 'pinky': // Anxiety
+                        emoji = '😰';
+                        break;
+                    case 'inky': // Doubt
+                        emoji = '😵‍💫';
+                        break;
+                    case 'clyde': // Loneliness
+                        emoji = '🥺'; 
+                        break;
                 }
-                ctx.lineTo(gx+7, gy+7);
-                ctx.lineTo(gx-7, gy+7);
-                ctx.fill();
-                // Worried eyes (wide)
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.ellipse(gx-3, gy+1, 2, 1.5, 0, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.ellipse(gx+3, gy+1, 2, 1.5, 0, 0, Math.PI*2);
-                ctx.fill();
-            } else if (g.name === 'inky') {
-                // DOUBT - Murky/Unclear shape
-                ctx.fillStyle = g.scared ? '#38bdf8' : '#9c27b0';
-                ctx.shadowColor = ctx.fillStyle;
-                ctx.beginPath();
-                // Blurry/uncertain edges
-                ctx.arc(gx, gy, 7, 0, Math.PI*2);
-                ctx.fill();
-                // Confused eyes
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(gx-3, gy, 1.5, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(gx+3, gy, 1.5, 0, Math.PI*2);
-                ctx.fill();
-                // Question mark mouth
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.arc(gx, gy+4, 1, 0, Math.PI);
-                ctx.stroke();
-            } else if (g.name === 'clyde') {
-                // LONELINESS - Fragmented/Broken shape
-                ctx.fillStyle = g.scared ? '#38bdf8' : '#00bcd4';
-                ctx.shadowColor = ctx.fillStyle;
-                // Draw broken pieces
-                ctx.beginPath();
-                ctx.arc(gx-3, gy-2, 3, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(gx+3, gy-2, 3, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(gx-2, gy+4, 3, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(gx+4, gy+4, 3, 0, Math.PI*2);
-                ctx.fill();
-                // Sad eyes
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(gx-3, gy-2, 1, 0, Math.PI*2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(gx+3, gy-2, 1, 0, Math.PI*2);
-                ctx.fill();
             }
             
+            ctx.fillText(emoji, gx, gy + 2);
             ctx.shadowBlur = 0;
         });
     }
@@ -826,7 +756,7 @@
             max-width: 80%;
             animation: quoteAppear 0.3s ease-out;
         `;
-        notification.textContent = 'ð ' + quote + ' ð';
+        notification.textContent = '💗 ' + quote + ' 💗';
         document.body.appendChild(notification);
         
         setTimeout(() => {
@@ -839,12 +769,10 @@
         if (musicStarted || !audioContext) return;
         musicStarted = true;
 
-        // Create a simple retrowave synth melody
         const now = audioContext.currentTime;
         const tempo = 120;
         const beatDuration = 60 / tempo;
         
-        // Melody notes (frequencies in Hz)
         const melody = [
             { freq: 523.25, duration: 0.5 },   // C5
             { freq: 659.25, duration: 0.5 },   // E5
@@ -877,7 +805,6 @@
             time += note.duration * beatDuration;
         });
 
-        // Loop the melody
         setTimeout(() => {
             if (gameActive && musicStarted) {
                 startRetrowaveMusic();
@@ -933,12 +860,9 @@
     // Start button
     document.getElementById('start-btn').addEventListener('click', () => {
         startScreen.classList.add('hidden');
-        
-        // Initialize audio context
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
-        
         init();
         gameActive = true;
         startRetrowaveMusic();
