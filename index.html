@@ -3,545 +3,495 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HEARTMAN: Hug Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>HEARTMAN: AAA Hug Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Orbitron:wght@400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         :root {
-            --primary: #ff1493;
-            --secondary: #00d4ff;
-            --accent: #ff006e;
-            --dark-bg: #0a0e27;
-            --darker-bg: #050810;
             --neon-pink: #ff007f;
             --neon-cyan: #00ffff;
-            --neon-purple: #b300ff;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-gradient: linear-gradient(45deg, #ff007f, #7000ff);
         }
-        
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body {
-            background: var(--darker-bg);
-            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a0033 50%, var(--darker-bg) 100%);
-            overflow: hidden;
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
-            font-family: 'Fredoka One', sans-serif;
+            background: #050505;
             color: #fff;
+            font-family: 'Inter', sans-serif;
             height: 100vh;
             height: 100dvh;
-            width: 100vw;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            position: fixed; /* Lock body to prevent any scroll */
+            touch-action: none;
         }
-        
-        #game-container {
+
+        #app-container {
             position: relative;
             width: 100%;
+            max-width: 500px;
             height: 100%;
             display: flex;
-            justify-content: center;
-            align-items: center;
             flex-direction: column;
-            background: radial-gradient(ellipse at 50% 50%, rgba(255, 20, 147, 0.1) 0%, transparent 70%);
-            padding: 10px;
-            touch-action: none; /* Crucial for mobile swipe */
+            background: radial-gradient(circle at 50% 0%, #1a0010 0%, #050505 100%);
+            padding: env(safe-area-inset-top) 20px env(safe-area-inset-bottom);
         }
-        
-        canvas {
-            box-shadow: 
-                0 0 30px rgba(255, 0, 127, 0.4),
-                0 0 60px rgba(0, 212, 255, 0.2);
-            border-radius: 8px;
-            border: 2px solid var(--neon-pink);
-            max-width: 100%;
-            max-height: 70vh;
-            background: #000;
-            display: block;
+
+        /* Glassmorphism UI */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
-        
-        .ui-layer {
-            width: 100%;
-            max-width: 500px;
+
+        header {
+            height: 80px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
-            z-index: 10;
-            font-family: 'Press Start 2P', monospace;
-            font-size: 10px;
-            background: rgba(10, 14, 39, 0.8);
-            border-radius: 8px;
-            margin-bottom: 10px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 0, 127, 0.3);
+            padding: 0 20px;
+            margin-top: 10px;
         }
-        
-        .score-label { color: var(--neon-pink); }
-        #score-el { color: var(--neon-cyan); margin-left: 5px; }
-        #high-score-el { color: var(--neon-purple); margin-left: 5px; }
-        
-        /* Screens */
-        .screen {
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            font-family: 'Orbitron';
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-family: 'Orbitron';
+            font-weight: 900;
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        #game-viewport {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        canvas {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 16px;
+            box-shadow: 0 0 40px rgba(255, 0, 127, 0.2);
+        }
+
+        /* Overlays */
+        .overlay {
             position: absolute;
             inset: 0;
+            z-index: 100;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 100;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-            backdrop-filter: blur(10px);
-            padding: 20px;
+            padding: 40px;
             text-align: center;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
-        .hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-        
-        #start-screen {
-            background: rgba(5, 8, 16, 0.95);
-        }
-        
-        .title-main {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(2.5rem, 8vw, 4rem);
+
+        .hidden { opacity: 0; visibility: hidden; transform: scale(1.1); }
+
+        .title-text {
+            font-family: 'Orbitron';
+            font-size: 42px;
             font-weight: 900;
-            color: var(--neon-pink);
-            text-shadow: 0 0 20px var(--neon-pink);
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
         }
-        
-        .title-sub {
-            font-size: clamp(0.8rem, 3vw, 1.2rem);
-            color: var(--neon-cyan);
-            margin-bottom: 30px;
-            letter-spacing: 2px;
-        }
-        
-        #start-btn {
-            padding: 15px 40px;
-            background: transparent;
-            border: 3px solid var(--neon-pink);
-            color: var(--neon-pink);
-            font-family: 'Press Start 2P', monospace;
+
+        .btn-primary {
+            padding: 18px 48px;
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: 100px;
+            color: #fff;
+            font-family: 'Orbitron';
+            font-weight: 700;
             font-size: 14px;
-            border-radius: 50px;
+            letter-spacing: 2px;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 0 15px var(--neon-pink);
+            box-shadow: 0 10px 20px rgba(255, 0, 127, 0.3);
+            transition: transform 0.2s;
         }
-        
-        #start-btn:hover {
-            background: var(--neon-pink);
-            color: #000;
-            box-shadow: 0 0 30px var(--neon-pink);
-            transform: scale(1.05);
-        }
-        
-        /* Win Screen - Love Letter */
-        #win-screen {
-            background: radial-gradient(circle, #2d0015 0%, #050810 100%);
+
+        .btn-primary:active { transform: scale(0.95); }
+
+        /* Win Sequence Styles */
+        #win-overlay {
+            background: #000;
             overflow-y: auto;
-            padding: 40px 20px;
-            -webkit-overflow-scrolling: touch;
+            display: block;
+            padding: 60px 30px;
         }
-        
-        .love-letter {
-            max-width: 600px;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid var(--neon-pink);
-            box-shadow: 0 0 40px rgba(255, 20, 147, 0.2);
-            animation: letterFadeIn 2s ease-out;
+
+        .love-letter-content {
+            max-width: 400px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease 0.5s;
         }
-        
-        @keyframes letterFadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        #win-overlay.active .love-letter-content {
+            opacity: 1;
+            transform: translateY(0);
         }
-        
-        .love-letter h1 {
-            font-family: 'Fredoka One', sans-serif;
+
+        .love-letter-content h2 {
+            font-family: 'Orbitron';
             color: var(--neon-pink);
-            margin-bottom: 20px;
-            font-size: 28px;
+            margin-bottom: 30px;
+            font-size: 24px;
         }
-        
-        .love-letter p {
-            font-family: 'Fredoka One', sans-serif;
-            line-height: 1.8;
+
+        .love-letter-content p {
             font-size: 18px;
-            margin-bottom: 20px;
-            color: #ffe4f1;
-        }
-        
-        .heart-big {
-            font-size: 60px;
-            margin: 20px 0;
-            animation: heartBeat 1.2s infinite;
-            display: inline-block;
-        }
-        
-        @keyframes heartBeat {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-        
-        .reward-msg {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 12px;
-            color: var(--neon-cyan);
-            margin-top: 30px;
-            line-height: 1.5;
+            line-height: 1.8;
+            color: #ccc;
+            margin-bottom: 24px;
+            font-weight: 300;
         }
 
-        .mobile-hint {
+        .floating-hearts {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .heart-particle {
+            position: absolute;
+            color: var(--neon-pink);
+            animation: floatUp 4s linear infinite;
+        }
+
+        @keyframes floatUp {
+            from { transform: translateY(100vh) scale(0); opacity: 1; }
+            to { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+        }
+
+        .joystick-hint {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: 'Press Start 2P';
             margin-top: 20px;
-            font-size: 12px;
-            color: #888;
-            font-family: 'Press Start 2P', monospace;
-        }
-
-        @keyframes quoteAppear {
-            from { opacity: 0; transform: translate(-50%, -60%); }
-            to { opacity: 1; transform: translate(-50%, -50%); }
         }
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <div class="ui-layer">
-        <div><span class="score-label">SCORE:</span><span id="score-el">0</span></div>
-        <div><span class="score-label">BEST:</span><span id="high-score-el">0</span></div>
-    </div>
-    
-    <canvas id="gameCanvas"></canvas>
-    
-    <div class="mobile-hint">SWIPE TO MOVE</div>
-</div>
+<div id="app-container">
+    <header class="glass-panel">
+        <div class="stat-box">
+            <div class="stat-label">SCORE</div>
+            <div id="score-val" class="stat-value">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">GOAL</div>
+            <div id="goal-val" class="stat-value">0</div>
+        </div>
+    </header>
 
-<!-- Start Screen -->
-<div id="start-screen" class="screen">
-    <div class="title-main">HEARTMAN</div>
-    <div class="title-sub">HUG EDITION</div>
-    <div id="enemies-display" style="margin-bottom: 30px; font-family: 'Press Start 2P'; font-size: 10px; color: var(--neon-cyan);">
-        STRESS • ANXIETY • DOUBT • LONELINESS
-    </div>
-    <button id="start-btn">START MISSION</button>
-    <div class="mobile-hint" style="margin-top: 40px;">COLLECT ALL HEARTS TO WIN</div>
-</div>
+    <div id="game-viewport">
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- Start Screen -->
+        <div id="start-overlay" class="overlay">
+            <h1 class="title-text">HEARTMAN</h1>
+            <p style="color: #888; margin-bottom: 40px; font-size: 14px;">A Love Story in Motion</p>
+            <button id="start-btn" class="btn-primary">BEGIN JOURNEY</button>
+            <p class="joystick-hint">SWIPE TO NAVIGATE</p>
+        </div>
 
-<!-- Win Screen -->
-<div id="win-screen" class="screen hidden">
-    <div class="love-letter">
-        <div class="heart-big">❤️</div>
-        <h1>I Love You So Much</h1>
-        <p>You bring so much value and meaning to my life. Every moment without you feels like a difficult level, but I know that love will always find a way through any situation, no matter how hard it gets.</p>
-        <p>I miss your hug more than words can say. Your hug is my sanctuary—it heals the inner child in me and makes everything feel right again.</p>
-        <p>You are my greatest achievement and my favorite person. Forever isn't long enough with you.</p>
-        <div class="reward-msg">MISSION COMPLETE: TRUE LOVE FOUND</div>
-        <button id="restart-btn" style="margin-top: 30px; padding: 10px 20px; background: none; border: 1px solid #fff; color: #fff; cursor: pointer; font-family: 'Press Start 2P'; font-size: 10px;">PLAY AGAIN</button>
+        <!-- Win Screen -->
+        <div id="win-overlay" class="overlay hidden">
+            <div class="floating-hearts" id="heart-container"></div>
+            <div class="love-letter-content">
+                <div style="font-size: 60px; margin-bottom: 20px;">â¤ï¸</div>
+                <h2>I Love You So Much</h2>
+                <p>You bring so much value and meaning to my life. Every challenge we face is just another level we'll beat together.</p>
+                <p>Love will always find a way through any difficult situation. I miss your hug more than words can express.</p>
+                <p>Your hug heals the inner child in me. It's my safe harbor in every storm.</p>
+                <button onclick="location.reload()" class="btn-primary" style="margin-top: 40px;">REPLAY LOVE</button>
+            </div>
+        </div>
     </div>
+
+    <footer style="height: 60px; display: flex; justify-content: center; align-items: center;">
+        <div style="width: 40px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;"></div>
+    </footer>
 </div>
 
 <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    const scoreEl = document.getElementById('score-el');
-    const highScoreEl = document.getElementById('high-score-el');
-    const startScreen = document.getElementById('start-screen');
-    const winScreen = document.getElementById('win-screen');
+    const scoreEl = document.getElementById('score-val');
+    const goalEl = document.getElementById('goal-val');
     
+    // Game Config
     const TILE_SIZE = 20;
-    const width = 28;
-    const layout = [
-        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-        1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
-        1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1,
-        1,3,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,3,1,
-        1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1,
-        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-        1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1,
-        1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,0,1,
-        1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1,
-        1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,
-        1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,
-        1,1,1,1,1,1,0,1,1,4,4,4,4,4,4,4,4,4,4,1,1,0,1,1,1,1,1,1,
-        1,1,1,1,1,1,0,1,1,4,1,1,1,2,2,1,1,1,4,1,1,0,1,1,1,1,1,1,
-        1,1,1,1,1,1,0,1,1,4,1,2,2,2,2,2,2,1,4,1,1,0,1,1,1,1,1,1,
-        4,4,4,4,4,4,0,0,0,4,1,2,2,2,2,2,2,1,4,0,0,0,4,4,4,4,4,4,
-        1,1,1,1,1,1,0,1,1,4,1,2,2,2,2,2,2,1,4,1,1,0,1,1,1,1,1,1,
-        1,1,1,1,1,1,0,1,1,4,1,1,1,1,1,1,1,1,4,1,1,0,1,1,1,1,1,1,
-        1,1,1,1,1,1,0,1,1,4,4,4,4,4,4,4,4,4,4,1,1,0,1,1,1,1,1,1,
-        1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,
-        1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,
-        1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
-        1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1,
-        1,0,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,0,1,
-        1,3,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,3,1,
-        1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1,
-        1,1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,0,1,1,0,1,1,0,1,1,1,
-        1,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1,
-        1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,
-        1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,
-        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
-        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+    const GRID_W = 19;
+    const GRID_H = 23;
+    
+    // 1 = Wall, 0 = Dot, 3 = Power, 2 = Ghost House (Closed)
+    const maze = [
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+        1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,
+        1,3,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,3,1,
+        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+        1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1,
+        1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1,
+        1,1,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,1,1,
+        1,1,1,1,0,1,0,0,0,0,0,0,0,1,0,1,1,1,1,
+        1,1,1,1,0,1,0,1,1,2,1,1,0,1,0,1,1,1,1,
+        0,0,0,0,0,0,0,1,2,2,2,1,0,0,0,0,0,0,0,
+        1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1,
+        1,1,1,1,0,1,0,0,0,0,0,0,0,1,0,1,1,1,1,
+        1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1,
+        1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,
+        1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1,
+        1,3,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,3,1,
+        1,1,0,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1,
+        1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1,
+        1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1,
+        1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
+        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
     ];
 
-    let squares = [];
-    let score = 0;
-    let highScore = 0;
-    let gameActive = false;
-    let audioCtx = null;
-    let musicStarted = false;
-
-    const pacman = {
-        index: 490,
-        dir: 0,
-        nextDir: 0,
-        rot: 0
+    let state = {
+        score: 0,
+        dots: 0,
+        active: false,
+        powerMode: 0,
+        pacman: { x: 9, y: 15, dir: {x:0, y:0}, nextDir: {x:0, y:0}, anim: 0 },
+        ghosts: [
+            { x: 9, y: 9, color: '#ff0033', speed: 0.08, dir: {x:1, y:0}, mode: 'chase' },
+            { x: 8, y: 9, color: '#ffb8ff', speed: 0.07, dir: {x:-1, y:0}, mode: 'chase' },
+            { x: 10, y: 9, color: '#00ffff', speed: 0.06, dir: {x:0, y:-1}, mode: 'chase' }
+        ],
+        eaten: new Set()
     };
 
-    const ghosts = [
-        { name: 'blinky', index: 348, speed: 150, timer: 0, scared: false, start: 348, currentDir: -1, color: '#ff1744', displayName: 'STRESS' },
-        { name: 'pinky', index: 376, speed: 200, timer: 0, scared: false, start: 376, currentDir: -1, color: '#ff6ec7', displayName: 'ANXIETY' },
-        { name: 'inky', index: 351, speed: 250, timer: 0, scared: false, start: 351, currentDir: 1, color: '#9c27b0', displayName: 'DOUBT' },
-        { name: 'clyde', index: 379, speed: 300, timer: 0, scared: false, start: 379, currentDir: 1, color: '#00bcd4', displayName: 'LONELINESS' }
-    ];
-
-    const hugQuotes = [
-        "Your hug is my home.",
-        "Everything is better with you.",
-        "Love heals everything.",
-        "You are my safe place.",
-        "I miss your warmth."
-    ];
-
     function init() {
-        const availableHeight = window.innerHeight * 0.7;
-        const availableWidth = window.innerWidth * 0.95;
-        const size = Math.min(availableWidth, availableHeight);
-        const scale = size / (width * TILE_SIZE);
+        const size = Math.min(window.innerWidth - 40, (window.innerHeight - 200));
+        const scale = size / (GRID_W * TILE_SIZE);
+        canvas.width = GRID_W * TILE_SIZE * scale;
+        canvas.height = GRID_H * TILE_SIZE * scale;
+        ctx.scale(scale, scale);
         
-        canvas.width = width * TILE_SIZE * scale;
-        canvas.height = width * TILE_SIZE * scale;
-        ctx.setTransform(scale, 0, 0, scale, 0, 0);
-        
-        // Calculate max score
-        let totalDots = layout.filter(cell => cell === 0).length;
-        let totalPower = layout.filter(cell => cell === 3).length;
-        highScore = totalDots + (totalPower * 50);
-        highScoreEl.innerText = highScore;
-        
-        drawBoard();
+        state.dots = maze.filter(t => t === 0 || t === 3).length;
+        goalEl.innerText = state.dots;
+        render();
     }
 
-    function drawBoard() {
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, width * TILE_SIZE, width * TILE_SIZE);
-        
-        layout.forEach((cell, i) => {
-            let x = (i % width) * TILE_SIZE;
-            let y = Math.floor(i / width) * TILE_SIZE;
-            
-            if (cell === 1) {
-                ctx.fillStyle = '#1a1a3e';
-                ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                ctx.strokeStyle = '#ff007f';
-                ctx.lineWidth = 0.5;
-                ctx.strokeRect(x+2, y+2, TILE_SIZE-4, TILE_SIZE-4);
-            } else if (cell === 0 && !squares[i]) {
-                ctx.fillStyle = '#fbcfe8';
-                ctx.beginPath();
-                ctx.arc(x + 10, y + 10, 2, 0, Math.PI * 2);
-                ctx.fill();
-            } else if (cell === 3 && !squares[i]) {
-                ctx.fillStyle = '#ff007f';
-                ctx.beginPath();
-                ctx.arc(x + 10, y + 10, 5, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        });
-
-        // Draw Pacman
-        let px = (pacman.index % width) * TILE_SIZE + 10;
-        let py = Math.floor(pacman.index / width) * TILE_SIZE + 10;
-        ctx.save();
-        ctx.translate(px, py);
-        ctx.rotate(pacman.rot);
-        ctx.font = "16px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText('❤️', 0, 0);
-        ctx.restore();
-
-        // Draw Ghosts
-        ghosts.forEach(g => {
-            let gx = (g.index % width) * TILE_SIZE + 10;
-            let gy = Math.floor(g.index / width) * TILE_SIZE + 10;
-            ctx.fillStyle = g.scared ? '#38bdf8' : g.color;
-            ctx.font = "14px Arial";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(g.scared ? '☁️' : '👻', gx, gy);
-        });
+    function getTile(x, y) {
+        const tx = Math.floor(x);
+        const ty = Math.floor(y);
+        if (tx < 0 || tx >= GRID_W || ty < 0 || ty >= GRID_H) return 1;
+        return maze[ty * GRID_W + tx];
     }
 
-    function gameLoop() {
-        if (!gameActive) return;
+    function update() {
+        if (!state.active) return;
 
-        // Movement
-        let nextMove = pacman.index + pacman.nextDir;
-        if (layout[nextMove] !== 1 && layout[nextMove] !== 2) {
-            pacman.dir = pacman.nextDir;
-        }
+        // Pacman Movement
+        const p = state.pacman;
         
-        let moveIdx = pacman.index + pacman.dir;
-        if (layout[moveIdx] !== 1 && layout[moveIdx] !== 2) {
-            pacman.index = moveIdx;
-            if (pacman.dir === 1) pacman.rot = 0;
-            if (pacman.dir === -1) pacman.rot = Math.PI;
-            if (pacman.dir === -width) pacman.rot = -Math.PI/2;
-            if (pacman.dir === width) pacman.rot = Math.PI/2;
-        }
-
-        // Eating
-        if ((layout[pacman.index] === 0 || layout[pacman.index] === 3) && !squares[pacman.index]) {
-            let points = layout[pacman.index] === 3 ? 50 : 1;
-            score += points;
-            squares[pacman.index] = true;
-            scoreEl.innerText = score;
-            
-            if (layout[pacman.index] === 3) {
-                showQuote();
-                ghosts.forEach(g => g.scared = true);
-                setTimeout(() => ghosts.forEach(g => g.scared = false), 8000);
-                playSfx(880, 0.1);
-            } else {
-                playSfx(440, 0.05);
+        // Try change direction at tile centers
+        if (Number.isInteger(p.x) && Number.isInteger(p.y)) {
+            if (getTile(p.x + p.nextDir.x, p.y + p.nextDir.y) !== 1) {
+                p.dir = {...p.nextDir};
             }
-        }
-
-        if (score >= highScore) {
-            endGame(true);
-            return;
-        }
-
-        // Ghost AI
-        ghosts.forEach(ghost => {
-            ghost.timer++;
-            let threshold = ghost.scared ? 15 : 8;
-            if (ghost.timer > threshold) {
-                ghost.timer = 0;
-                const moves = [-1, 1, -width, width];
-                let valid = moves.filter(d => layout[ghost.index + d] !== 1);
-                ghost.index += valid[Math.floor(Math.random() * valid.length)];
-                
-                if (ghost.index === pacman.index) {
-                    if (ghost.scared) {
-                        ghost.index = ghost.start;
-                        score += 100;
-                    } else {
-                        endGame(false);
+            if (getTile(p.x + p.dir.x, p.y + p.dir.y) === 1) {
+                p.dir = {x:0, y:0};
+            }
+            
+            // Eat
+            const idx = Math.floor(p.y) * GRID_W + Math.floor(p.x);
+            if (!state.eaten.has(idx)) {
+                if (maze[idx] === 0 || maze[idx] === 3) {
+                    state.eaten.add(idx);
+                    state.score++;
+                    scoreEl.innerText = state.score;
+                    playSfx(440 + (state.score % 10) * 20, 0.05);
+                    if (maze[idx] === 3) {
+                        state.powerMode = 400;
+                        playSfx(880, 0.2);
                     }
+                    if (state.score >= state.dots) win();
+                }
+            }
+        }
+
+        p.x = Math.round((p.x + p.dir.x * 0.15) * 100) / 100;
+        p.y = Math.round((p.y + p.dir.y * 0.15) * 100) / 100;
+        
+        // Wrap around
+        if (p.x < 0) p.x = GRID_W - 1;
+        if (p.x >= GRID_W) p.x = 0;
+
+        // Ghost AI (Smart Chase)
+        state.ghosts.forEach(g => {
+            if (Number.isInteger(g.x) && Number.isInteger(g.y)) {
+                const moves = [{x:1,y:0}, {x:-1,y:0}, {x:0,y:1}, {x:0,y:-1}];
+                const valid = moves.filter(m => getTile(g.x + m.x, g.y + m.y) !== 1 && (m.x !== -g.dir.x || m.y !== -g.dir.y));
+                
+                if (valid.length > 0) {
+                    // Target Pacman
+                    valid.sort((a, b) => {
+                        const distA = Math.hypot(g.x + a.x - p.x, g.y + a.y - p.y);
+                        const distB = Math.hypot(g.x + b.x - p.x, g.y + b.y - p.y);
+                        return state.powerMode > 0 ? distB - distA : distA - distB;
+                    });
+                    g.dir = valid[0];
+                } else {
+                    g.dir = {x: -g.dir.x, y: -g.dir.y};
+                }
+            }
+            g.x = Math.round((g.x + g.dir.x * g.speed) * 100) / 100;
+            g.y = Math.round((g.y + g.dir.y * g.speed) * 100) / 100;
+
+            // Collision
+            if (Math.hypot(g.x - p.x, g.y - p.y) < 0.6) {
+                if (state.powerMode > 0) {
+                    g.x = 9; g.y = 9;
+                    state.score += 10;
+                } else {
+                    gameOver();
                 }
             }
         });
 
-        drawBoard();
-        setTimeout(() => requestAnimationFrame(gameLoop), 120);
+        if (state.powerMode > 0) state.powerMode--;
+        render();
+        requestAnimationFrame(update);
     }
 
-    function showQuote() {
-        const q = hugQuotes[Math.floor(Math.random() * hugQuotes.length)];
-        const div = document.createElement('div');
-        div.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,20,147,0.9);padding:15px;border-radius:10px;color:white;z-index:1000;font-family:Fredoka One;animation:quoteAppear 0.5s ease-out;`;
-        div.innerText = "💖 " + q;
-        document.body.appendChild(div);
-        setTimeout(() => div.remove(), 1500);
+    function render() {
+        ctx.clearRect(0, 0, GRID_W * TILE_SIZE, GRID_H * TILE_SIZE);
+        
+        // Draw Maze
+        maze.forEach((t, i) => {
+            if (state.eaten.has(i)) return;
+            const x = (i % GRID_W) * TILE_SIZE;
+            const y = Math.floor(i / GRID_W) * TILE_SIZE;
+            
+            if (t === 1) {
+                ctx.fillStyle = '#1a1a2e';
+                ctx.fillRect(x+2, y+2, TILE_SIZE-4, TILE_SIZE-4);
+            } else if (t === 0) {
+                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                ctx.beginPath(); ctx.arc(x+10, y+10, 2, 0, 7); ctx.fill();
+            } else if (t === 3) {
+                ctx.fillStyle = varColor('--neon-pink');
+                ctx.beginPath(); ctx.arc(x+10, y+10, 5, 0, 7); ctx.fill();
+            }
+        });
+
+        // Draw Pacman
+        ctx.fillStyle = '#ffeb3b';
+        ctx.beginPath();
+        ctx.arc(state.pacman.x * TILE_SIZE + 10, state.pacman.y * TILE_SIZE + 10, 8, 0.2 * Math.PI, 1.8 * Math.PI);
+        ctx.lineTo(state.pacman.x * TILE_SIZE + 10, state.pacman.y * TILE_SIZE + 10);
+        ctx.fill();
+
+        // Draw Ghosts
+        state.ghosts.forEach(g => {
+            ctx.fillStyle = state.powerMode > 0 ? '#2196f3' : g.color;
+            const gx = g.x * TILE_SIZE + 10;
+            const gy = g.y * TILE_SIZE + 10;
+            ctx.beginPath();
+            ctx.arc(gx, gy, 8, Math.PI, 0);
+            ctx.lineTo(gx + 8, gy + 8);
+            ctx.lineTo(gx - 8, gy + 8);
+            ctx.fill();
+        });
     }
 
-    function playSfx(freq, dur) {
+    function varColor(name) { return getComputedStyle(document.documentElement).getPropertyValue(name); }
+
+    let audioCtx;
+    function playSfx(f, d) {
         if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
+        const o = audioCtx.createOscillator();
         const g = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        g.gain.setValueAtTime(0.1, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
-        osc.connect(g);
-        g.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + dur);
+        o.frequency.value = f;
+        g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + d);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + d);
     }
 
-    function startMusic() {
-        if (musicStarted) return;
-        musicStarted = true;
-        const notes = [261, 329, 392, 523];
-        let i = 0;
+    function win() {
+        state.active = false;
+        document.getElementById('win-overlay').classList.remove('hidden');
+        document.getElementById('win-overlay').classList.add('active');
+        spawnHearts();
+    }
+
+    function gameOver() {
+        state.active = false;
+        alert("Love never gives up! Try again.");
+        location.reload();
+    }
+
+    function spawnHearts() {
+        const container = document.getElementById('heart-container');
         setInterval(() => {
-            if (gameActive) playSfx(notes[i++ % notes.length], 0.2);
-        }, 500);
+            const h = document.createElement('div');
+            h.className = 'heart-particle';
+            h.innerHTML = 'â¤ï¸';
+            h.style.left = Math.random() * 100 + '%';
+            h.style.fontSize = (Math.random() * 20 + 10) + 'px';
+            container.appendChild(h);
+            setTimeout(() => h.remove(), 4000);
+        }, 200);
     }
 
-    function endGame(win) {
-        gameActive = false;
-        if (win) {
-            winScreen.classList.remove('hidden');
-        } else {
-            alert("Love is patient! Try again.");
-            location.reload();
-        }
-    }
-
-    // Controls
-    document.addEventListener('keydown', e => {
-        if (e.key === 'ArrowLeft') pacman.nextDir = -1;
-        if (e.key === 'ArrowRight') pacman.nextDir = 1;
-        if (e.key === 'ArrowUp') pacman.nextDir = -width;
-        if (e.key === 'ArrowDown') pacman.nextDir = width;
-    });
-
-    let tsX, tsY;
+    // Input
+    let startX, startY;
     document.addEventListener('touchstart', e => {
-        tsX = e.touches[0].clientX;
-        tsY = e.touches[0].clientY;
-    }, {passive: false});
-
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    });
     document.addEventListener('touchend', e => {
-        let dx = e.changedTouches[0].clientX - tsX;
-        let dy = e.changedTouches[0].clientY - tsY;
-        if (Math.abs(dx) > 20 || Math.abs(dy) > 20) {
-            if (Math.abs(dx) > Math.abs(dy)) pacman.nextDir = dx > 0 ? 1 : -1;
-            else pacman.nextDir = dy > 0 ? width : -width;
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dx) > 30 || Math.abs(dy) > 30) {
+            if (Math.abs(dx) > Math.abs(dy)) state.pacman.nextDir = {x: dx > 0 ? 1 : -1, y: 0};
+            else state.pacman.nextDir = {x: 0, y: dy > 0 ? 1 : -1};
         }
-    }, {passive: false});
-
-    document.getElementById('start-btn').addEventListener('click', () => {
-        startScreen.classList.add('hidden');
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        gameActive = true;
-        startMusic();
-        gameLoop();
     });
 
-    document.getElementById('restart-btn').addEventListener('click', () => location.reload());
+    document.getElementById('start-btn').onclick = () => {
+        document.getElementById('start-overlay').classList.add('hidden');
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        state.active = true;
+        update();
+    };
 
     window.onload = init;
     window.onresize = init;
-    
-    // Prevent scrolling during gameplay but allow it on win screen
-    document.addEventListener('touchmove', e => {
-        if (gameActive || !winScreen.classList.contains('hidden')) {
-            if (gameActive) e.preventDefault();
-        }
-    }, {passive: false});
 </script>
-
 </body>
 </html>
