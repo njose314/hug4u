@@ -25,7 +25,7 @@
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
-            font-family: 'Press Start 2P', cursive; /* Global Pixel Font */
+            font-family: 'Press Start 2P', cursive;
             color: #fff;
             min-height: 100vh;
             min-height: 100dvh;
@@ -66,7 +66,7 @@
             padding: 10px 10px;
             box-sizing: border-box;
             z-index: 10;
-            font-size: 10px; /* Reduced for pixel font */
+            font-size: 10px;
             letter-spacing: 1px;
             text-shadow: 0 0 10px var(--neon-pink);
             margin-bottom: 8px;
@@ -90,7 +90,7 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            font-size: 8px; /* Tiny pixel text */
+            font-size: 8px;
             color: #aaa;
             text-transform: uppercase;
         }
@@ -182,30 +182,6 @@
         }
 
         /* --- PIXEL ART HEART (CSS ONLY) --- */
-        .pixel-heart {
-            position: relative;
-            width: 20px;
-            height: 20px;
-            background: var(--neon-pink);
-            box-shadow: 
-                20px 0 var(--neon-pink), 
-                40px 0 var(--neon-pink), 
-                0 20px var(--neon-pink), 
-                60px 20px var(--neon-pink), 
-                0 40px var(--neon-pink), 
-                60px 40px var(--neon-pink), 
-                20px 60px var(--neon-pink), 
-                40px 60px var(--neon-pink), 
-                20px 80px var(--neon-pink), 
-                40px 80px var(--neon-pink),
-                30px 100px var(--neon-pink); /* Tip */
-            transform: scale(3);
-            margin: 60px auto; 
-            image-rendering: pixelated;
-            animation: pixelBeat 1.5s infinite steps(2);
-        }
-        
-        /* Helper to make the shape correct with box-shadows on a 1x1 div */
         .pixel-heart-container {
             width: 100px;
             height: 100px;
@@ -216,7 +192,6 @@
             margin-bottom: 40px;
         }
 
-        /* Simplified 8-bit Heart Shape using a pseudo element technique for cleaner code */
         .pixel-heart-art {
             width: 10px; 
             height: 10px; 
@@ -247,7 +222,7 @@
         }
         
         .finale-quote {
-            font-size: clamp(0.7rem, 2vw, 1rem); /* Pixel font needs space */
+            font-size: clamp(0.7rem, 2vw, 1rem);
             color: var(--neon-cyan);
             line-height: 1.8;
             margin-bottom: 30px;
@@ -361,9 +336,7 @@
     <div id="start-screen" class="overlay-screen">
         <div class="title-main">HEART<br>MAN</div>
         <div class="title-sub">HUG DAY EDITION<br>v2.0</div>
-        
         <div id="enemies-display" style="margin: 20px 0; text-align: center; font-size: 8px; color: #00d4ff; line-height: 1.8;"></div>
-        
         <button id="start-btn" class="retro-btn">INSERT COIN</button>
     </div>
 
@@ -377,7 +350,6 @@
         <div class="pixel-heart-container">
             <div class="pixel-heart-art"></div>
         </div>
-        
         <div class="finale-text">
             <h2 class="finale-title">HAPPY HUG DAY</h2>
             <div id="final-quote-container" class="finale-quote"></div>
@@ -403,7 +375,6 @@
     const width = 28;
     const TILE_SIZE = 20;
     
-    // 0 = Dot, 1 = Wall, 2 = House, 3 = Powerup, 4 = Empty
     const layout = [
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
         1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -439,9 +410,9 @@
     let score = 0;
     let winningScore = 0;
     let gameActive = false;
-    let musicAudio = new Audio('https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3');
+    let musicAudio = new Audio('https://ericskiff.com/music/Resistor%20Anthems/06%20A%20Night%20Of%20Dizzy%20Spells.mp3');
     musicAudio.loop = true;
-    musicAudio.volume = 0.4;
+    musicAudio.volume = 0.5;
     
     let pacman = { index: 490, dir: 1, nextDir: 1, rot: 0 };
     let currentSessionQuotes = [];
@@ -528,7 +499,6 @@
         return shuffled.slice(0, count);
     }
     
-    // Ghost Data
     let ghosts = [
         { name: 'blinky', index: 348, speed: 130, timer: 0, scared: false, start: 348, currentDir: -1, color: '#ff1744', displayName: 'STRESS', icon: '😡' },
         { name: 'pinky', index: 376, speed: 180, timer: 0, scared: false, start: 376, currentDir: -1, color: '#ff6ec7', displayName: 'ANXIETY', icon: '😰' },
@@ -558,10 +528,9 @@
         canvas.height = width * TILE_SIZE * scale;
         ctx.scale(scale, scale);
         
-        // Setup Game Logic
         winningScore = countMaxScore();
         targetEl.innerText = winningScore;
-        currentSessionQuotes = shuffleQuotes(powerupQuotes, 4); // Pick 4 random quotes for this run
+        currentSessionQuotes = shuffleQuotes(powerupQuotes, 4); 
         
         drawBoard();
     }
@@ -602,7 +571,6 @@
             squares[pacman.index] = true;
             scoreEl.innerText = score;
             
-            // Pop a quote
             if(currentSessionQuotes.length > 0) {
                 showHugQuote(currentSessionQuotes.pop());
             } else {
@@ -665,10 +633,14 @@
                     ghost.currentDir = bestDir;
                     ghost.index += bestDir;
                 }
+            }
 
-                if (ghost.index === pacman.index) {
-                    if (ghost.scared) ghost.index = ghost.start;
-                    else endGame(false);
+            // --- CRITICAL FIX: COLLISION CHECK EVERY FRAME (OUTSIDE TIMER) ---
+            if (ghost.index === pacman.index) {
+                if (ghost.scared) {
+                    ghost.index = ghost.start;
+                } else {
+                    endGame(false);
                 }
             }
         });
@@ -709,7 +681,6 @@
             }
         });
 
-        // DRAW HEARTMAN
         let px = (pacman.index % width) * TILE_SIZE + 10;
         let py = Math.floor(pacman.index / width) * TILE_SIZE + 10;
         ctx.save();
@@ -722,7 +693,6 @@
         ctx.fillText('❤️', 0, 2);
         ctx.restore();
 
-        // DRAW GLOOMS
         ghosts.forEach(g => {
             let gx = (g.index % width) * TILE_SIZE + 10;
             let gy = Math.floor(g.index / width) * TILE_SIZE + 10;
@@ -750,7 +720,6 @@
     function endGame(win) {
         gameActive = false;
         if(win) {
-            // Select random finale quote
             const finalQuote = finaleQuotes[Math.floor(Math.random() * finaleQuotes.length)];
             finalQuoteContainer.innerHTML = `"${finalQuote}"`;
             
