@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HEARTMAN: Hug Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -25,7 +25,7 @@
             touch-action: none;
             user-select: none;
             -webkit-user-select: none;
-            font-family: 'Fredoka One', sans-serif;
+            font-family: 'Press Start 2P', cursive; /* Global Pixel Font */
             color: #fff;
             min-height: 100vh;
             min-height: 100dvh;
@@ -47,12 +47,13 @@
                 0 0 30px rgba(255, 0, 127, 0.4),
                 0 0 60px rgba(0, 212, 255, 0.2),
                 inset 0 0 30px rgba(255, 0, 127, 0.1);
-            border-radius: 8px;
-            border: 2px solid var(--neon-pink);
+            border-radius: 4px;
+            border: 4px solid var(--neon-pink);
             max-width: 100%;
-            max-height: 75vh; /* Reduced slightly to fit controls */
+            max-height: 70vh; 
             background: #000;
             display: block;
+            image-rendering: pixelated;
         }
         
         /* UI Top Layer */
@@ -62,23 +63,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 24px;
+            padding: 10px 10px;
             box-sizing: border-box;
             z-index: 10;
-            font-family: 'Press Start 2P', monospace;
-            font-size: 11px;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-cyan);
-            background: rgba(10, 14, 39, 0.6);
-            border-radius: 8px;
+            font-size: 10px; /* Reduced for pixel font */
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px var(--neon-pink);
             margin-bottom: 8px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 0, 127, 0.3);
+            line-height: 1.5;
         }
         
-        .score-label { color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink); }
-        #score-el { color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan); font-weight: bold; min-width: 60px; text-align: right; }
-        .goal-label { color: var(--neon-purple); text-shadow: 0 0 10px var(--neon-purple); }
+        .score-label { color: var(--neon-pink); }
+        #score-el { color: var(--neon-cyan); }
+        .goal-label { color: var(--neon-purple); }
         #target-el { color: #fff; }
 
         /* Bottom Controls */
@@ -87,27 +84,26 @@
             max-width: 560px;
             margin-top: 10px;
             padding: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #333;
+            border-radius: 4px;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            font-family: 'Fredoka One', sans-serif;
-            font-size: 12px;
-            color: #ccc;
-            backdrop-filter: blur(5px);
+            font-size: 8px; /* Tiny pixel text */
+            color: #aaa;
+            text-transform: uppercase;
         }
 
         .control-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             text-align: center;
         }
 
-        .control-icon { font-size: 20px; }
+        .control-icon { font-size: 16px; margin-bottom: 2px; }
         
         .hidden {
             opacity: 0;
@@ -115,7 +111,7 @@
             visibility: hidden;
         }
 
-        /* Screens (Start, Game Over, Finale) */
+        /* Screens */
         .overlay-screen {
             position: absolute;
             inset: 0;
@@ -125,174 +121,194 @@
             justify-content: center;
             z-index: 50;
             transition: opacity 0.5s ease;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
+            padding: 20px;
         }
         
         #start-screen {
-            background: linear-gradient(135deg, rgba(10, 14, 39, 0.95) 0%, rgba(26, 0, 51, 0.95) 100%);
-            border: 1px solid rgba(255, 0, 127, 0.2);
+            background: linear-gradient(135deg, rgba(10, 14, 39, 0.98) 0%, rgba(26, 0, 51, 0.98) 100%);
         }
 
         #game-over-screen {
-            background: radial-gradient(circle at center, rgba(50, 0, 0, 0.9) 0%, #000 100%);
+            background: rgba(20, 0, 0, 0.95);
             z-index: 55;
         }
 
         #finale-screen {
-            background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.95) 100%);
+            background: #000;
             z-index: 60;
+            border: 4px solid var(--neon-pink);
         }
         
-        .title-container {
-            text-align: center;
-            margin-bottom: 20px;
-            animation: titleGlow 2s ease-in-out infinite;
-        }
-        
-        @keyframes titleGlow {
-            0%, 100% { text-shadow: 0 0 10px var(--neon-pink), 0 0 20px var(--neon-pink); }
-            50% { text-shadow: 0 0 20px var(--neon-pink), 0 0 40px var(--neon-cyan), 0 0 60px var(--neon-pink); }
-        }
-        
+        /* Titles */
         .title-main {
             font-family: 'Orbitron', sans-serif;
-            font-size: clamp(3rem, 10vw, 5rem);
+            font-size: clamp(2rem, 8vw, 4rem);
             font-weight: 900;
             color: var(--neon-pink);
             letter-spacing: 4px;
-            line-height: 1.1;
-            margin-bottom: 8px;
-            text-transform: uppercase;
+            margin-bottom: 16px;
+            text-align: center;
+            text-shadow: 4px 4px 0px #96004b;
         }
         
         .title-sub {
-            font-family: 'Fredoka One', sans-serif;
-            font-size: clamp(0.8rem, 3vw, 1.2rem);
+            font-size: clamp(0.5rem, 2.5vw, 0.8rem);
             color: var(--neon-cyan);
-            letter-spacing: 3px;
-            text-transform: uppercase;
+            letter-spacing: 1px;
             margin-bottom: 32px;
+            text-align: center;
+            line-height: 1.5;
         }
         
-        /* Buttons */
+        /* Pixel Button */
         .retro-btn {
-            position: relative;
-            padding: 16px 32px;
-            background: transparent;
-            border: 3px solid var(--neon-pink);
+            padding: 15px 20px;
+            background: #000;
+            border: 4px solid var(--neon-pink);
             color: var(--neon-pink);
-            font-family: 'Press Start 2P', monospace;
-            font-size: 12px;
-            letter-spacing: 2px;
-            border-radius: 8px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.1s;
             text-transform: uppercase;
-            box-shadow: 0 0 20px rgba(255, 0, 127, 0.3);
-            overflow: hidden;
+            box-shadow: 6px 6px 0px rgba(255, 0, 127, 0.4);
             margin-top: 20px;
         }
         
-        .retro-btn:hover {
-            background: rgba(255, 0, 127, 0.2);
-            color: #fff;
-            box-shadow: 0 0 30px rgba(255, 0, 127, 0.6), 0 0 60px rgba(0, 212, 255, 0.3);
-            transform: scale(1.05);
+        .retro-btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: 2px 2px 0px rgba(255, 0, 127, 0.4);
         }
 
-        /* Animations */
-        .heart-container {
+        /* --- PIXEL ART HEART (CSS ONLY) --- */
+        .pixel-heart {
             position: relative;
-            width: 100%;
-            max-width: 400px;
-            height: 200px;
+            width: 20px;
+            height: 20px;
+            background: var(--neon-pink);
+            box-shadow: 
+                20px 0 var(--neon-pink), 
+                40px 0 var(--neon-pink), 
+                0 20px var(--neon-pink), 
+                60px 20px var(--neon-pink), 
+                0 40px var(--neon-pink), 
+                60px 40px var(--neon-pink), 
+                20px 60px var(--neon-pink), 
+                40px 60px var(--neon-pink), 
+                20px 80px var(--neon-pink), 
+                40px 80px var(--neon-pink),
+                30px 100px var(--neon-pink); /* Tip */
+            transform: scale(3);
+            margin: 60px auto; 
+            image-rendering: pixelated;
+            animation: pixelBeat 1.5s infinite steps(2);
+        }
+        
+        /* Helper to make the shape correct with box-shadows on a 1x1 div */
+        .pixel-heart-container {
+            width: 100px;
+            height: 100px;
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
             margin-bottom: 40px;
         }
-        
-        .heart-emoji {
-            font-size: clamp(4rem, 15vw, 8rem);
-            position: absolute;
-            transition: all 1s ease;
-            filter: drop-shadow(0 0 20px rgba(255, 0, 127, 0.5));
+
+        /* Simplified 8-bit Heart Shape using a pseudo element technique for cleaner code */
+        .pixel-heart-art {
+            width: 10px; 
+            height: 10px; 
+            background: transparent;
+            color: var(--neon-pink);
+            box-shadow: 
+                20px 0, 50px 0,
+                10px 10px, 60px 10px,
+                0 20px, 70px 20px,
+                0 30px, 70px 30px,
+                0 40px, 70px 40px,
+                10px 50px, 60px 50px,
+                20px 60px, 50px 60px,
+                30px 70px, 40px 70px;
+            transform: scale(3);
+            animation: pixelBeat 0.8s infinite alternate;
+        }
+
+        @keyframes pixelBeat {
+            from { transform: scale(3); }
+            to { transform: scale(3.5); filter: brightness(1.3); }
         }
         
-        #final-heart { left: 15%; animation: heartFloat 3s ease-in-out infinite; }
-        #final-partner { right: 15%; opacity: 0.4; animation: partnerFloat 3s ease-in-out infinite; animation-delay: 0.5s; }
-        #final-hug { opacity: 0; transform: scale(0.5); animation: hugAppear 1s ease-out forwards 1.5s, hugPulse 1s ease-in-out infinite 2.5s; }
-        
-        @keyframes heartFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
-        @keyframes partnerFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
-        @keyframes hugAppear { to { opacity: 1; transform: scale(1); } }
-        @keyframes hugPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        
-        .finale-text, .game-over-text {
+        /* Typography */
+        .finale-text {
             text-align: center;
-            opacity: 0;
-            animation: fadeInText 1s ease-out forwards 0.5s;
+            max-width: 600px;
         }
-        
-        @keyframes fadeInText { to { opacity: 1; } }
         
         .finale-quote {
-            font-family: 'Fredoka One', sans-serif;
-            font-size: clamp(1rem, 4vw, 1.4rem);
+            font-size: clamp(0.7rem, 2vw, 1rem); /* Pixel font needs space */
             color: var(--neon-cyan);
-            text-shadow: 0 0 20px var(--neon-cyan);
-            line-height: 1.6;
-            margin-bottom: 24px;
-            font-style: italic;
-            max-width: 90%;
-            margin-left: auto;
-            margin-right: auto;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 0 #0055aa;
+            border: 2px dashed #333;
+            padding: 20px;
+            background: rgba(0,0,0,0.5);
         }
         
         .finale-title {
-            font-family: 'Press Start 2P', monospace;
-            font-size: clamp(0.8rem, 3vw, 1.2rem);
+            font-size: 1.5rem;
             color: var(--neon-pink);
-            text-shadow: 0 0 20px var(--neon-pink);
-            letter-spacing: 2px;
             margin-bottom: 24px;
             text-transform: uppercase;
+            text-shadow: 3px 3px 0 #550022;
+            animation: rainbow 3s infinite;
+        }
+
+        @keyframes rainbow {
+            0% { color: #ff007f; }
+            33% { color: #00ffff; }
+            66% { color: #ff00ff; }
+            100% { color: #ff007f; }
         }
 
         .game-over-title {
-            font-family: 'Press Start 2P', monospace;
             font-size: 2rem;
             color: #ff3333;
-            text-shadow: 0 0 20px #ff0000;
+            text-shadow: 4px 4px 0 #550000;
             margin-bottom: 20px;
+            text-align: center;
         }
 
         .game-over-sub {
-            font-size: 1.2rem;
+            font-size: 0.8rem;
             margin-bottom: 30px;
-            color: #ddd;
+            color: #ccc;
+            text-align: center;
+            line-height: 1.6;
         }
 
         /* Popup Notification */
         #quote-popup {
             position: fixed;
-            top: 60px;
+            top: 20px;
             left: 50%;
             transform: translate(-50%, -20px);
-            background: rgba(255, 0, 127, 0.95);
-            color: #fff;
-            padding: 15px 20px;
-            border-radius: 8px;
-            font-family: 'Fredoka One', sans-serif;
-            font-size: 14px;
+            background: #000;
+            color: var(--neon-pink);
+            padding: 15px 15px;
+            border: 2px solid var(--neon-pink);
+            box-shadow: 4px 4px 0 rgba(255, 0, 127, 0.5);
+            font-size: 9px; 
             text-align: center;
             z-index: 100;
-            box-shadow: 0 0 30px rgba(255, 0, 127, 0.6);
-            border: 2px solid #ff007f;
-            max-width: 90%;
+            max-width: 95%;
+            width: 300px;
             opacity: 0;
             pointer-events: none;
-            transition: all 0.5s ease;
+            transition: all 0.2s ease;
+            line-height: 1.4;
         }
 
         #quote-popup.visible {
@@ -301,10 +317,10 @@
         }
         
         @media (max-width: 600px) {
-            .ui-layer { font-size: 9px; padding: 10px 16px; gap: 12px; }
-            canvas { border-radius: 6px; border-width: 1px; }
-            .bottom-controls { flex-wrap: wrap; font-size: 10px; }
+            .ui-layer { padding: 10px; }
+            .bottom-controls { flex-wrap: wrap; }
             .control-item { width: 45%; margin-bottom: 5px; }
+            .title-main { font-size: 2.5rem; }
         }
     </style>
 </head>
@@ -313,11 +329,11 @@
 <div id="game-container">
     <div class="ui-layer">
         <div>
-            <span class="score-label">SCORE:</span>
+            <span class="score-label">PTS:</span>
             <span id="score-el">0</span>
         </div>
         <div>
-            <span class="goal-label">TARGET: <span id="target-el">0</span></span>
+            <span class="goal-label">GOAL: <span id="target-el">0</span></span>
         </div>
     </div>
 
@@ -325,55 +341,47 @@
 
     <div class="bottom-controls">
         <div class="control-item">
-            <div class="control-icon">👆👇👈👉</div>
-            <div>Swipe / Arrow Keys</div>
+            <div class="control-icon">🕹️</div>
+            <div>Swipe</div>
         </div>
         <div class="control-item">
             <div class="control-icon">❤️</div>
-            <div>Collect All Love</div>
+            <div>Collect</div>
         </div>
         <div class="control-item">
-            <div class="control-icon">😡😰😵‍💫🥺</div>
-            <div>Avoid Glooms</div>
+            <div class="control-icon">👾</div>
+            <div>Avoid</div>
         </div>
          <div class="control-item">
-            <div class="control-icon">💗</div>
-            <div>Powerup (x4 Only)</div>
+            <div class="control-icon">⚡</div>
+            <div>Powerup</div>
         </div>
     </div>
 
     <div id="start-screen" class="overlay-screen">
-        <div class="title-container">
-            <div class="title-main">HEART<br>MAN</div>
-            <div class="title-sub">❤️ HUG DAY SPECIAL ❤️</div>
-        </div>
+        <div class="title-main">HEART<br>MAN</div>
+        <div class="title-sub">HUG DAY EDITION<br>v2.0</div>
         
-        <div id="enemies-display" style="margin: 20px 0; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 9px; color: #00d4ff; text-shadow: 0 0 10px #00d4ff;"></div>
+        <div id="enemies-display" style="margin: 20px 0; text-align: center; font-size: 8px; color: #00d4ff; line-height: 1.8;"></div>
         
         <button id="start-btn" class="retro-btn">INSERT COIN</button>
     </div>
 
     <div id="game-over-screen" class="overlay-screen hidden">
-        <div class="game-over-text">
-            <h1 class="game-over-title">HEARTBROKEN</h1>
-            <p class="game-over-sub">The Glooms got you...<br>But love never gives up.</p>
-            <button class="retro-btn" onclick="location.reload()">TRY AGAIN</button>
-        </div>
+        <h1 class="game-over-title">GAME OVER</h1>
+        <p class="game-over-sub">The Glooms win this time.<br>But love is persistent.</p>
+        <button class="retro-btn" onclick="location.reload()">RETRY</button>
     </div>
 
     <div id="finale-screen" class="overlay-screen hidden">
-        <div class="heart-container">
-            <div id="final-heart" class="heart-emoji">❤️</div>
-            <div id="final-partner" class="heart-emoji">👤</div>
-            <div id="final-hug" class="heart-emoji">🫂</div>
+        <div class="pixel-heart-container">
+            <div class="pixel-heart-art"></div>
         </div>
         
         <div class="finale-text">
-            <p class="finale-quote">
-                "No matter how bad the situations are, love always finds a way.<br>I love your hugs. You're the best."
-            </p>
-            <h2 class="finale-title">HAPPY HUG DAY!</h2>
-            <button class="retro-btn" onclick="location.reload()">REPLAY FOREVER</button>
+            <h2 class="finale-title">HAPPY HUG DAY</h2>
+            <div id="final-quote-container" class="finale-quote"></div>
+            <button class="retro-btn" onclick="location.reload()">PLAY AGAIN</button>
         </div>
     </div>
 
@@ -389,12 +397,13 @@
     const gameOverScreen = document.getElementById('game-over-screen');
     const finaleScreen = document.getElementById('finale-screen');
     const quotePopup = document.getElementById('quote-popup');
+    const finalQuoteContainer = document.getElementById('final-quote-container');
 
     // --- CONFIGURATION ---
     const width = 28;
     const TILE_SIZE = 20;
     
-    // 0 = Dot (1pt), 1 = Wall, 2 = Ghost House, 3 = Powerup (50pts), 4 = Empty
+    // 0 = Dot, 1 = Wall, 2 = House, 3 = Powerup, 4 = Empty
     const layout = [
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
         1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -437,7 +446,74 @@
     let pacman = { index: 490, dir: 1, nextDir: 1, rot: 0 };
     let currentSessionQuotes = [];
 
-    // --- CALCULATE EXACT WINNING SCORE ---
+    // --- 40 POWERUP QUOTES ---
+    const powerupQuotes = [
+        "Imagine me grabbing your bum while we kiss",
+        "Imagine us kissing in the rain on the roof",
+        "Imagine us cuddling in a thunderstorm",
+        "I want to wake up next to you daily",
+        "Your laugh is my favorite sound",
+        "You are my safe space",
+        "Every love song is about you",
+        "I'd choose you in a hundred lifetimes",
+        "Imagine us dancing to jazz in the kitchen",
+        "You make the gloomy days sunny",
+        "I am so addicted to you",
+        "Imagine holding hands on an old street",
+        "My heart beats faster near you",
+        "You are the best thing ever",
+        "I love you more than pizza",
+        "Imagine a lazy Sunday in sheets",
+        "You are my home",
+        "I just want to hold you tight",
+        "Even when I'm angry, I love you",
+        "Imagine us growing old flirting",
+        "You're the peanut butter to my jelly",
+        "I love it when you smile at me",
+        "Imagine late night drives holding hands",
+        "You smell like home",
+        "I crave your touch constantly",
+        "You are my favorite distraction",
+        "I love you to the moon and back",
+        "You are my happy place",
+        "Imagine us star gazing on a hill",
+        "I love the way you look at me",
+        "You're my dream come true",
+        "Imagine breakfast in bed together",
+        "I want to steal your hoodies",
+        "You're sweeter than chocolate",
+        "I get butterflies seeing you",
+        "Imagine us adopting a puppy",
+        "I never want to stop making memories",
+        "Your voice calms my soul",
+        "I love your warm hugs",
+        "You are my forever plus one"
+    ];
+
+    // --- 20 FINALE QUOTES ---
+    const finaleQuotes = [
+        "No matter how bad the situations are, love always finds a way. I love your hugs.",
+        "In your arms is the only place I want to be. Happy Hug Day.",
+        "A hug from you mends all my broken pieces. You are my everything.",
+        "Distance means nothing when one hug can change everything.",
+        "I would fight the world just to end the day in your arms.",
+        "Your hugs are my anchor in this stormy world.",
+        "One hug from you wipes away a thousand worries.",
+        "Home is not a place, it's the feeling of your arms around me.",
+        "I survived the maze of life just to find your embrace.",
+        "The best gift you can give me is a tight hug that lasts forever.",
+        "My favorite place in the universe? Right next to you.",
+        "Through every gloom and every fear, I choose you.",
+        "You are the pause button on my chaotic life.",
+        "Let's stay tangled in a hug until the world ends.",
+        "Your heartbeat is the rhythm I want to fall asleep to.",
+        "Nothing feels as safe as being held by you.",
+        "I gathered all this love just to give it to you.",
+        "A hug is a handshake from the heart, and my heart is yours.",
+        "You are the warmth in my coldest winters.",
+        "Here's to a lifetime of hugs, laughter, and us."
+    ];
+
     function countMaxScore() {
         let total = 0;
         layout.forEach(cell => {
@@ -447,36 +523,9 @@
         return total;
     }
 
-    // --- ROMANTIC QUOTE POOL (20+) ---
-    const allQuotes = [
-        "Imagine me grabbing your bum while we kiss",
-        "Imagine us kissing in the rain on the rooftop of our house",
-        "Imagine us cuddling together in a thunderstorm under a blanket",
-        "I want to wake up next to you every single day",
-        "Your laugh is my favorite sound in the world",
-        "You are my safe space",
-        "Every love song is about you now",
-        "I’d choose you in a hundred lifetimes",
-        "Imagine us cooking dinner together dancing to jazz",
-        "You make the gloomy days sunny",
-        "I am so addicted to you",
-        "Imagine us holding hands walking down an old street",
-        "My heart beats faster whenever you are near",
-        "You are the best thing that ever happened to me",
-        "I love you more than pizza (and that says a lot)",
-        "Imagine a lazy Sunday morning just tangled in sheets",
-        "You are my home",
-        "I just want to hold you tight and never let go",
-        "Even when I'm angry, I still love you",
-        "Imagine us growing old and still flirting",
-        "You're the peanut butter to my jelly",
-        "I love it when you smile at me",
-        "Imagine late night drives with your hand in mine"
-    ];
-
-    function shuffleQuotes() {
-        let shuffled = [...allQuotes].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, 4);
+    function shuffleQuotes(pool, count) {
+        let shuffled = [...pool].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, count);
     }
     
     // Ghost Data
@@ -490,9 +539,9 @@
     function displayEnemiesOnTitle() {
         const enemiesDisplay = document.getElementById('enemies-display');
         if (!enemiesDisplay) return;
-        let html = '<div style="margin-bottom: 12px; letter-spacing: 2px; color: #ff007f;">THE GLOOMS:</div>';
+        let html = '<div style="margin-bottom: 8px; color: #ff007f;">THE GLOOMS:</div>';
         ghosts.forEach(g => {
-            html += `<div style="margin: 5px 0; color: ${g.color}; text-shadow: 0 0 8px ${g.color}; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            html += `<div style="margin: 4px 0; color: ${g.color}; display: flex; align-items: center; justify-content: center; gap: 8px;">
                         <span style="font-size: 14px;">${g.icon}</span> <span>${g.displayName}</span>
                      </div>`;
         });
@@ -502,8 +551,7 @@
     displayEnemiesOnTitle();
     
     function init() {
-        // Layout Scaling
-        const availableHeight = window.innerHeight * 0.7; // Reduced height to fit controls
+        const availableHeight = window.innerHeight * 0.7; 
         const availableWidth = window.innerWidth * 0.95;
         let scale = Math.min(availableWidth / (width * TILE_SIZE), availableHeight / (width * TILE_SIZE));
         canvas.width = width * TILE_SIZE * scale;
@@ -513,7 +561,7 @@
         // Setup Game Logic
         winningScore = countMaxScore();
         targetEl.innerText = winningScore;
-        currentSessionQuotes = shuffleQuotes();
+        currentSessionQuotes = shuffleQuotes(powerupQuotes, 4); // Pick 4 random quotes for this run
         
         drawBoard();
     }
@@ -558,7 +606,7 @@
             if(currentSessionQuotes.length > 0) {
                 showHugQuote(currentSessionQuotes.pop());
             } else {
-                showHugQuote("I love you more!");
+                showHugQuote("Bonus Love!");
             }
             
             ghosts.forEach(g => g.scared = true);
@@ -566,7 +614,6 @@
             if(navigator.vibrate) navigator.vibrate(20);
         }
 
-        // Exact Score Win Condition
         if (score >= winningScore) { endGame(true); return; }
 
         // --- GHOST AI ---
@@ -596,7 +643,6 @@
                     let bestDir = validMoves[Math.floor(Math.random() * validMoves.length)];
                     
                     if (!ghost.scared) {
-                        // HUNTING LOGIC
                         let target = pacman.index;
                         if (ghost.name === 'pinky') target = pacman.index + (pacman.dir * 4);
                         if (ghost.name === 'clyde') {
@@ -609,7 +655,6 @@
                             if (dst < minDst) { minDst = dst; bestDir = dir; }
                         });
                     } else {
-                        // FEAR LOGIC
                         let maxDst = -1;
                         validMoves.forEach(dir => {
                             let dst = getDistance(ghost.index + dir, pacman.index);
@@ -671,7 +716,7 @@
         ctx.translate(px, py);
         ctx.shadowBlur = 15;
         ctx.shadowColor = '#ff3366';
-        ctx.font = "20px 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', Arial";
+        ctx.font = "20px 'Segoe UI Emoji', Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText('❤️', 0, 2);
@@ -684,7 +729,7 @@
             
             ctx.shadowBlur = 10;
             ctx.shadowColor = g.color;
-            ctx.font = "20px 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', Arial";
+            ctx.font = "20px 'Segoe UI Emoji', Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             
@@ -695,7 +740,7 @@
     }
 
     function showHugQuote(text) {
-        quotePopup.innerHTML = '✨ ' + text + ' ✨';
+        quotePopup.innerHTML = text;
         quotePopup.classList.add('visible');
         setTimeout(() => {
             quotePopup.classList.remove('visible');
@@ -705,13 +750,12 @@
     function endGame(win) {
         gameActive = false;
         if(win) {
+            // Select random finale quote
+            const finalQuote = finaleQuotes[Math.floor(Math.random() * finaleQuotes.length)];
+            finalQuoteContainer.innerHTML = `"${finalQuote}"`;
+            
             finaleScreen.classList.remove('hidden');
-            setTimeout(() => {
-                document.getElementById('final-heart').style.opacity = '1';
-                document.getElementById('final-partner').style.opacity = '0.4';
-                document.getElementById('final-hug').style.opacity = '1';
-                if(navigator.vibrate) navigator.vibrate([100,50,100]);
-            }, 500);
+            if(navigator.vibrate) navigator.vibrate([100,50,100]);
         } else {
             gameOverScreen.classList.remove('hidden');
             if(navigator.vibrate) navigator.vibrate(200);
