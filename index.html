@@ -414,10 +414,10 @@
     musicAudio.loop = true;
     musicAudio.volume = 0.5;
     
-    let pacman = { index: 490, dir: 1, nextDir: 1, rot: 0 };
+    // Add prevIndex to track swaps
+    let pacman = { index: 490, dir: 1, nextDir: 1, rot: 0, prevIndex: 490 };
     let currentSessionQuotes = [];
 
-    // --- 40 POWERUP QUOTES ---
     const powerupQuotes = [
         "Imagine me grabbing your bum while we kiss",
         "Imagine us kissing in the rain on the roof",
@@ -461,7 +461,6 @@
         "You are my forever plus one"
     ];
 
-    // --- 20 FINALE QUOTES ---
     const finaleQuotes = [
         "No matter how bad the situations are, love always finds a way. I love your hugs.",
         "In your arms is the only place I want to be. Happy Hug Day.",
@@ -499,11 +498,12 @@
         return shuffled.slice(0, count);
     }
     
+    // Ghosts with prevIndex for tracking swaps
     let ghosts = [
-        { name: 'blinky', index: 348, speed: 130, timer: 0, scared: false, start: 348, currentDir: -1, color: '#ff1744', displayName: 'STRESS', icon: '😡' },
-        { name: 'pinky', index: 376, speed: 180, timer: 0, scared: false, start: 376, currentDir: -1, color: '#ff6ec7', displayName: 'ANXIETY', icon: '😰' },
-        { name: 'inky', index: 351, speed: 220, timer: 0, scared: false, start: 351, currentDir: 1, color: '#9c27b0', displayName: 'DOUBT', icon: '😵‍💫' },
-        { name: 'clyde', index: 379, speed: 280, timer: 0, scared: false, start: 379, currentDir: 1, color: '#00bcd4', displayName: 'LONELINESS', icon: '🥺' }
+        { name: 'blinky', index: 348, prevIndex: 348, speed: 130, timer: 0, scared: false, start: 348, currentDir: -1, color: '#ff1744', displayName: 'STRESS', icon: '😡' },
+        { name: 'pinky', index: 376, prevIndex: 376, speed: 180, timer: 0, scared: false, start: 376, currentDir: -1, color: '#ff6ec7', displayName: 'ANXIETY', icon: '😰' },
+        { name: 'inky', index: 351, prevIndex: 351, speed: 220, timer: 0, scared: false, start: 351, currentDir: 1, color: '#9c27b0', displayName: 'DOUBT', icon: '😵‍💫' },
+        { name: 'clyde', index: 379, prevIndex: 379, speed: 280, timer: 0, scared: false, start: 379, currentDir: 1, color: '#00bcd4', displayName: 'LONELINESS', icon: '🥺' }
     ];
     
     function displayEnemiesOnTitle() {
@@ -535,16 +535,6 @@
         drawBoard();
     }
 
-    function getCoordinates(index) {
-        return { x: index % width, y: Math.floor(index / width) };
-    }
-
-    function getDistance(idx1, idx2) {
-        const c1 = getCoordinates(idx1);
-        const c2 = getCoordinates(idx2);
-        return Math.sqrt(Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2));
-    }
-
     function gameLoop() {
         if (!gameActive) return;
 
@@ -556,6 +546,7 @@
         let moveIdx = pacman.index + pacman.dir;
         
         if (layout[moveIdx] !== 1 && layout[moveIdx] !== 2) {
+            pacman.prevIndex = pacman.index; // Track previous position
             pacman.index = moveIdx;
         }
 
@@ -613,32 +604,40 @@
                     if (!ghost.scared) {
                         let target = pacman.index;
                         if (ghost.name === 'pinky') target = pacman.index + (pacman.dir * 4);
-                        if (ghost.name === 'clyde') {
-                            if(getDistance(ghost.index, pacman.index) < 8) target = 0;
-                        }
-
+                        
                         let minDst = Infinity;
                         validMoves.forEach(dir => {
-                            let dst = getDistance(ghost.index + dir, target);
+                            let c1 = { x: (ghost.index + dir) % width, y: Math.floor((ghost.index + dir) / width) };
+                            let c2 = { x: target % width, y: Math.floor(target / width) };
+                            let dst = Math.sqrt(Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2));
                             if (dst < minDst) { minDst = dst; bestDir = dir; }
                         });
                     } else {
                         let maxDst = -1;
                         validMoves.forEach(dir => {
-                            let dst = getDistance(ghost.index + dir, pacman.index);
+                            let c1 = { x: (ghost.index + dir) % width, y: Math.floor((ghost.index + dir) / width) };
+                            let c2 = { x: pacman.index % width, y: Math.floor(pacman.index / width) };
+                            let dst = Math.sqrt(Math.pow(c1.x - c2.x, 2) + Math.pow(c1.y - c2.y, 2));
                             if (dst > maxDst) { maxDst = dst; bestDir = dir; }
                         });
                     }
                     
-                    ghost.currentDir = bestDir;
+                    ghost.prevIndex = ghost.index; // Track previous position
                     ghost.index += bestDir;
+                    ghost.currentDir = bestDir;
                 }
             }
 
-            // --- CRITICAL FIX: COLLISION CHECK EVERY FRAME (OUTSIDE TIMER) ---
-            if (ghost.index === pacman.index) {
+            // --- IMPROVED COLLISION DETECTION ---
+            // 1. Direct overlap
+            // 2. Swapped positions (Pass-through fix)
+            let collision = (ghost.index === pacman.index) || 
+                            (ghost.prevIndex === pacman.index && ghost.index === pacman.prevIndex);
+            
+            if (collision) {
                 if (ghost.scared) {
                     ghost.index = ghost.start;
+                    ghost.prevIndex = ghost.start;
                 } else {
                     endGame(false);
                 }
@@ -739,11 +738,16 @@
     });
 
     let tsX, tsY;
-    document.addEventListener('touchstart', e => { tsX = e.touches[0].clientX; tsY = e.touches[0].clientY; }, {passive: false});
+    document.addEventListener('touchstart', e => { 
+        e.preventDefault(); // Stop scrolling on swipe
+        tsX = e.touches[0].clientX; 
+        tsY = e.touches[0].clientY; 
+    }, {passive: false});
+    
     document.addEventListener('touchend', e => {
         let dx = e.changedTouches[0].clientX - tsX;
         let dy = e.changedTouches[0].clientY - tsY;
-        if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
+        if (Math.abs(dx) > 30 || Math.abs(dy) > 30) { // Increased threshold slightly
             if(Math.abs(dx) > Math.abs(dy)) pacman.nextDir = dx > 0 ? 1 : -1;
             else pacman.nextDir = dy > 0 ? width : -width;
         }
