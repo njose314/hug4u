@@ -99,18 +99,9 @@
             text-shadow: 0 0 10px var(--neon-purple);
         }
         
-        .neon-text {
-            text-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
-        }
-        
         .hidden {
             opacity: 0;
             pointer-events: none;
-        }
-        
-        .fade-in {
-            opacity: 1;
-            pointer-events: auto;
         }
         
         /* Start Screen */
@@ -182,30 +173,11 @@
             margin-bottom: 32px;
         }
         
-        #start-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: var(--neon-pink);
-            transition: left 0.3s ease;
-            z-index: -1;
-        }
-        
-        #start-btn:hover::before {
-            left: 0;
-        }
-        
         #start-btn:hover {
-            color: #000;
+            background: rgba(255, 0, 127, 0.2);
+            color: #fff;
             box-shadow: 0 0 30px rgba(255, 0, 127, 0.6), 0 0 60px rgba(0, 212, 255, 0.3);
             transform: scale(1.05);
-        }
-        
-        #start-btn:active {
-            transform: scale(0.98);
         }
         
         .instructions {
@@ -224,9 +196,7 @@
             animation: pulse 2s ease-in-out infinite;
         }
         
-        .instruction-item:nth-child(2) {
-            animation-delay: 0.3s;
-        }
+        .instruction-item:nth-child(2) { animation-delay: 0.3s; }
         
         @keyframes pulse {
             0%, 100% { opacity: 0.6; }
@@ -272,42 +242,14 @@
             filter: drop-shadow(0 0 20px rgba(255, 0, 127, 0.5));
         }
         
-        #final-heart {
-            left: 15%;
-            animation: heartFloat 3s ease-in-out infinite;
-        }
+        #final-heart { left: 15%; animation: heartFloat 3s ease-in-out infinite; }
+        #final-partner { right: 15%; opacity: 0.4; animation: partnerFloat 3s ease-in-out infinite; animation-delay: 0.5s; }
+        #final-hug { opacity: 0; transform: scale(0.5); animation: hugAppear 1s ease-out forwards 1.5s, hugPulse 1s ease-in-out infinite 2.5s; }
         
-        #final-partner {
-            right: 15%;
-            opacity: 0.4;
-            animation: partnerFloat 3s ease-in-out infinite;
-            animation-delay: 0.5s;
-        }
-        
-        #final-hug {
-            opacity: 0;
-            transform: scale(0.5);
-            animation: hugAppear 1s ease-out forwards 1.5s, hugPulse 1s ease-in-out infinite 2.5s;
-        }
-        
-        @keyframes heartFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        
-        @keyframes partnerFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        
-        @keyframes hugAppear {
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        @keyframes hugPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
+        @keyframes heartFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        @keyframes partnerFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+        @keyframes hugAppear { to { opacity: 1; transform: scale(1); } }
+        @keyframes hugPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
         
         .finale-text {
             text-align: center;
@@ -316,9 +258,7 @@
             animation: fadeInText 1s ease-out forwards 2.5s;
         }
         
-        @keyframes fadeInText {
-            to { opacity: 1; }
-        }
+        @keyframes fadeInText { to { opacity: 1; } }
         
         .finale-quote {
             font-family: 'Fredoka One', sans-serif;
@@ -365,18 +305,9 @@
             transform: scale(1.05);
         }
         
-        /* Responsive */
         @media (max-width: 600px) {
-            .ui-layer {
-                font-size: 9px;
-                padding: 10px 16px;
-                gap: 12px;
-            }
-            
-            canvas {
-                border-radius: 6px;
-                border-width: 1px;
-            }
+            .ui-layer { font-size: 9px; padding: 10px 16px; gap: 12px; }
+            canvas { border-radius: 6px; border-width: 1px; }
         }
     </style>
 </head>
@@ -389,7 +320,7 @@
             <span id="score-el">0</span>
         </div>
         <div>
-            <span class="goal-label">GOAL: 274</span>
+            <span class="goal-label">TARGET: 450</span>
         </div>
     </div>
 
@@ -403,13 +334,13 @@
         
         <div id="enemies-display" style="margin: 20px 0; text-align: center; font-family: 'Press Start 2P', monospace; font-size: 9px; color: #00d4ff; text-shadow: 0 0 10px #00d4ff;"></div>
         
-        <button id="start-btn">INSERT COIN</button>
+        <button id="start-btn">INSERT COIN & PLAY MUSIC</button>
         
         <div class="instructions">
             <div class="instruction-item">❤️ = LOVE (COLLECT)</div>
             <div class="instruction-item">🎮 SWIPE TO MOVE</div>
             <div class="instruction-item">👻 AVOID GLOOMS</div>
-            <div class="instruction-item">💗 POWERUPS UNLOCK QUOTES</div>
+            <div class="instruction-item">💗 4 POWERUPS ONLY!</div>
         </div>
     </div>
 
@@ -422,20 +353,15 @@
         
         <div class="finale-text">
             <p class="finale-quote">
-                "No matter how difficult things can get,<br>I would do anything for that hug."
+                "No matter how bad the situations are, love always finds a way.<br>I love your hugs. You're the best."
             </p>
             <h2 class="finale-title">HAPPY HUG DAY!</h2>
-            
             <button class="finale-btn" onclick="location.reload()">REPLAY FOREVER</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ============================================
-    // HEARTMAN: HUG EDITION - COMPLETE GAME
-    // ============================================
-    
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const scoreEl = document.getElementById('score-el');
@@ -445,6 +371,7 @@
     // --- CONFIGURATION ---
     const width = 28;
     const TILE_SIZE = 20;
+    // Standard Pacman Layout
     const layout = [
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
         1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -479,32 +406,53 @@
     let squares = [];
     let score = 0;
     let gameActive = false;
-    let musicStarted = false;
-    let audioContext = null;
-    let oscillators = [];
+    let musicAudio = new Audio('https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3');
+    musicAudio.loop = true;
+    musicAudio.volume = 0.4;
     
     let pacman = { index: 490, dir: 1, nextDir: 1, rot: 0 };
-    let animationId;
-    
-    // Hug-themed powerup quotes
-    const hugQuotes = [
-        "A hug is the best medicine for a broken heart.",
-        "In your arms, I find my home.",
-        "Every hug is a promise of forever.",
-        "Your hug makes everything better.",
-        "I love you more than words can say.",
-        "Hugs are proof that love is real.",
-        "You're my favorite person to hug.",
-        "A hug from you is worth a thousand words.",
-        "Together, we're unstoppable.",
-        "You make my heart skip a beat."
+    let currentSessionQuotes = [];
+
+    // --- ROMANTIC QUOTE POOL (20+) ---
+    const allQuotes = [
+        "Imagine me grabbing your bum while we kiss",
+        "Imagine us kissing in the rain on the rooftop of our house",
+        "Imagine us cuddling together in a thunderstorm under a blanket",
+        "I want to wake up next to you every single day",
+        "Your laugh is my favorite sound in the world",
+        "You are my safe space",
+        "Every love song is about you now",
+        "I’d choose you in a hundred lifetimes",
+        "Imagine us cooking dinner together dancing to jazz",
+        "You make the gloomy days sunny",
+        "I am so addicted to you",
+        "Imagine us holding hands walking down an old street",
+        "My heart beats faster whenever you are near",
+        "You are the best thing that ever happened to me",
+        "I love you more than pizza (and that says a lot)",
+        "Imagine a lazy Sunday morning just tangled in sheets",
+        "You are my home",
+        "I just want to hold you tight and never let go",
+        "Even when I'm angry, I still love you",
+        "Imagine us growing old and still flirting",
+        "You're the peanut butter to my jelly",
+        "I love it when you smile at me",
+        "Imagine late night drives with your hand in mine"
     ];
+
+    // Shuffle and pick 4
+    function shuffleQuotes() {
+        let shuffled = [...allQuotes].sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, 4);
+    }
     
+    // Updated Ghost Definitions
+    // Speeds increased slightly for "Hunting"
     let ghosts = [
-        { name: 'blinky', index: 348, speed: 150, timer: 0, scared: false, start: 348, currentDir: -1, color: '#ff1744', displayName: 'STRESS' },
-        { name: 'pinky', index: 376, speed: 200, timer: 0, scared: false, start: 376, currentDir: -1, color: '#ff6ec7', displayName: 'ANXIETY' },
-        { name: 'inky', index: 351, speed: 250, timer: 0, scared: false, start: 351, currentDir: 1, color: '#9c27b0', displayName: 'DOUBT' },
-        { name: 'clyde', index: 379, speed: 300, timer: 0, scared: false, start: 379, currentDir: 1, color: '#00bcd4', displayName: 'LONELINESS' }
+        { name: 'blinky', index: 348, speed: 130, timer: 0, scared: false, start: 348, currentDir: -1, color: '#ff1744', displayName: 'STRESS', icon: '😡' },
+        { name: 'pinky', index: 376, speed: 180, timer: 0, scared: false, start: 376, currentDir: -1, color: '#ff6ec7', displayName: 'ANXIETY', icon: '😰' },
+        { name: 'inky', index: 351, speed: 220, timer: 0, scared: false, start: 351, currentDir: 1, color: '#9c27b0', displayName: 'DOUBT', icon: '😵‍💫' },
+        { name: 'clyde', index: 379, speed: 280, timer: 0, scared: false, start: 379, currentDir: 1, color: '#00bcd4', displayName: 'LONELINESS', icon: '🥺' }
     ];
     
     function displayEnemiesOnTitle() {
@@ -512,7 +460,9 @@
         if (!enemiesDisplay) return;
         let html = '<div style="margin-bottom: 12px; letter-spacing: 2px; color: #ff007f;">THE GLOOMS:</div>';
         ghosts.forEach(g => {
-            html += '<div style="margin: 5px 0; color: ' + g.color + '; text-shadow: 0 0 8px ' + g.color + ';">' + g.displayName + '</div>';
+            html += `<div style="margin: 5px 0; color: ${g.color}; text-shadow: 0 0 8px ${g.color}; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <span style="font-size: 14px;">${g.icon}</span> <span>${g.displayName}</span>
+                     </div>`;
         });
         enemiesDisplay.innerHTML = html;
     }
@@ -520,13 +470,16 @@
     displayEnemiesOnTitle();
     
     function init() {
-        const containerW = document.getElementById('game-container').clientWidth;
         const availableHeight = window.innerHeight * 0.8;
         const availableWidth = window.innerWidth * 0.95;
         let scale = Math.min(availableWidth / (width * TILE_SIZE), availableHeight / (width * TILE_SIZE));
         canvas.width = width * TILE_SIZE * scale;
         canvas.height = width * TILE_SIZE * scale;
         ctx.scale(scale, scale);
+        
+        // Randomize quotes for this session
+        currentSessionQuotes = shuffleQuotes();
+        
         drawBoard();
     }
 
@@ -552,17 +505,11 @@
         
         if (layout[moveIdx] !== 1 && layout[moveIdx] !== 2) {
             pacman.index = moveIdx;
-            if(pacman.dir === 1) pacman.rot = 0;
-            if(pacman.dir === -1) pacman.rot = Math.PI;
-            if(pacman.dir === -width) pacman.rot = -Math.PI/2;
-            if(pacman.dir === width) pacman.rot = Math.PI/2;
         }
 
-        // Tunneling
         if(pacman.index === 392) pacman.index = 419;
         else if(pacman.index === 419) pacman.index = 392;
 
-        // Eating
         if (layout[pacman.index] === 0 && !squares[pacman.index]) {
             score++;
             squares[pacman.index] = true;
@@ -572,78 +519,87 @@
             squares[pacman.index] = true;
             scoreEl.innerText = score;
             
-            // Show hug quote
-            showHugQuote();
+            // Pop a quote
+            if(currentSessionQuotes.length > 0) {
+                showHugQuote(currentSessionQuotes.pop());
+            } else {
+                showHugQuote("I love you!");
+            }
             
-            // Scare ghosts
             ghosts.forEach(g => g.scared = true);
             setTimeout(() => ghosts.forEach(g => g.scared = false), 10000);
             if(navigator.vibrate) navigator.vibrate(20);
         }
 
-        if (score >= 274) { endGame(true); return; }
+        // Increased Goal for harder difficulty
+        if (score >= 450) { endGame(true); return; }
 
-        // --- GHOST AI ---
+        // --- IMPROVED GHOST AI (HUNTING) ---
         ghosts.forEach(ghost => {
             ghost.timer++;
-            let moveThreshold = ghost.scared ? 12 : (ghost.name === 'blinky' ? 5 : 8); 
+            // Move faster (lower threshold)
+            let moveThreshold = ghost.scared ? 12 : (ghost.name === 'blinky' ? 4 : 6); 
             
             if (ghost.timer > moveThreshold) {
                 ghost.timer = 0;
                 
                 const possibleMoves = [-1, 1, -width, width];
-                
-                // Filter out walls (1) only - allow lair walls (2) and paths (0, 3, 4)
                 let validMoves = possibleMoves.filter(dir => {
                     let next = ghost.index + dir;
-                    if(layout[next] === 1) return false; // Only block hard walls
+                    if(layout[next] === 1) return false;
                     if (!ghost.scared && dir === -ghost.currentDir) return false;
                     return true;
                 });
 
-                // If dead end, allow reverse
                 if(validMoves.length === 0) {
                      validMoves = possibleMoves.filter(dir => {
                         let next = ghost.index + dir;
-                        return layout[next] !== 1; // Only block hard walls
+                        return layout[next] !== 1;
                      });
                 }
 
                 if (validMoves.length > 0) {
                     let bestDir = validMoves[Math.floor(Math.random() * validMoves.length)];
-
+                    
                     if (!ghost.scared) {
+                        // HUNTING LOGIC
                         let target = pacman.index;
                         
-                        // Pinky: 4 tiles ahead
+                        // Pinky tries to ambush (4 tiles ahead)
                         if (ghost.name === 'pinky') {
-                            target = pacman.index + (pacman.dir * 4);
+                            // Boundary checks ignored for simplicity in grid math
+                             target = pacman.index + (pacman.dir * 4);
+                        }
+                        
+                        // Clyde scatters if too close (8 tiles)
+                        if (ghost.name === 'clyde') {
+                            if(getDistance(ghost.index, pacman.index) < 8) {
+                                target = 0; // Go to corner
+                            }
                         }
 
-                        // Blinky & Pinky: Target Closest Distance
-                        if (ghost.name === 'blinky' || ghost.name === 'pinky') {
-                            let minDst = Infinity;
-                            validMoves.forEach(dir => {
-                                let dst = getDistance(ghost.index + dir, target);
-                                if (dst < minDst) {
-                                    minDst = dst;
-                                    bestDir = dir;
-                                }
-                            });
-                        }
+                        // Aggressive Pathfinding for everyone except scared
+                        let minDst = Infinity;
+                        validMoves.forEach(dir => {
+                            let dst = getDistance(ghost.index + dir, target);
+                            if (dst < minDst) { minDst = dst; bestDir = dir; }
+                        });
+                    } else {
+                        // FEAR LOGIC: Pick move furthest from Pacman
+                        let maxDst = -1;
+                        validMoves.forEach(dir => {
+                            let dst = getDistance(ghost.index + dir, pacman.index);
+                            if (dst > maxDst) { maxDst = dst; bestDir = dir; }
+                        });
                     }
                     
                     ghost.currentDir = bestDir;
                     ghost.index += bestDir;
                 }
 
-                // Collision
                 if (ghost.index === pacman.index) {
-                    if (ghost.scared) {
-                        ghost.index = ghost.start;
-                    } else {
-                        endGame(false);
-                    }
+                    if (ghost.scared) ghost.index = ghost.start;
+                    else endGame(false);
                 }
             }
         });
@@ -684,132 +640,54 @@
             }
         });
 
-        // Pacman (The Heart)
+        // DRAW HEARTMAN
         let px = (pacman.index % width) * TILE_SIZE + 10;
         let py = Math.floor(pacman.index / width) * TILE_SIZE + 10;
         ctx.save();
         ctx.translate(px, py);
-        ctx.rotate(pacman.rot);
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 15;
         ctx.shadowColor = '#ff3366';
-        ctx.font = "16px Arial";
+        ctx.font = "20px 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText('❤️', 0, 2);
         ctx.restore();
 
-        // Ghosts (The Negative Emotions)
+        // DRAW GLOOMS
         ghosts.forEach(g => {
             let gx = (g.index % width) * TILE_SIZE + 10;
             let gy = Math.floor(g.index / width) * TILE_SIZE + 10;
             
             ctx.shadowBlur = 10;
             ctx.shadowColor = g.color;
-            ctx.font = "16px Arial";
+            ctx.font = "20px 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             
-            let emoji = '';
-            
-            if (g.scared) {
-                emoji = '😱'; // Scared
-            } else {
-                switch(g.name) {
-                    case 'blinky': // Stress
-                        emoji = '😡';
-                        break;
-                    case 'pinky': // Anxiety
-                        emoji = '😰';
-                        break;
-                    case 'inky': // Doubt
-                        emoji = '😵‍💫';
-                        break;
-                    case 'clyde': // Loneliness
-                        emoji = '🥺'; 
-                        break;
-                }
-            }
-            
+            // If scared, turn into Invisible Emoji
+            let emoji = g.scared ? '🫥' : g.icon;
             ctx.fillText(emoji, gx, gy + 2);
             ctx.shadowBlur = 0;
         });
     }
 
-    function showHugQuote() {
-        const quote = hugQuotes[Math.floor(Math.random() * hugQuotes.length)];
+    // Popup Logic - Moved to Top
+    function showHugQuote(text) {
         const notification = document.createElement('div');
         notification.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 0, 127, 0.9);
-            color: #fff;
-            padding: 20px 30px;
-            border-radius: 8px;
-            font-family: 'Fredoka One', sans-serif;
-            font-size: 14px;
-            text-align: center;
-            z-index: 100;
-            box-shadow: 0 0 30px rgba(255, 0, 127, 0.6);
-            border: 2px solid #ff007f;
-            max-width: 80%;
-            animation: quoteAppear 0.3s ease-out;
+            position: fixed; top: 80px; left: 50%; transform: translate(-50%, 0);
+            background: rgba(255, 0, 127, 0.95); color: #fff; padding: 15px 20px;
+            border-radius: 8px; font-family: 'Fredoka One', sans-serif; font-size: 13px;
+            text-align: center; z-index: 100; box-shadow: 0 0 30px rgba(255, 0, 127, 0.6);
+            border: 2px solid #ff007f; max-width: 90%; animation: quoteAppear 0.5s ease-out;
+            pointer-events: none;
         `;
-        notification.textContent = '💗 ' + quote + ' 💗';
+        notification.innerHTML = '✨ ' + text + ' ✨';
         document.body.appendChild(notification);
-        
         setTimeout(() => {
-            notification.style.animation = 'quoteDisappear 0.3s ease-out forwards';
-            setTimeout(() => notification.remove(), 300);
-        }, 2000);
-    }
-
-    function startRetrowaveMusic() {
-        if (musicStarted || !audioContext) return;
-        musicStarted = true;
-
-        const now = audioContext.currentTime;
-        const tempo = 120;
-        const beatDuration = 60 / tempo;
-        
-        const melody = [
-            { freq: 523.25, duration: 0.5 },   // C5
-            { freq: 659.25, duration: 0.5 },   // E5
-            { freq: 783.99, duration: 0.5 },   // G5
-            { freq: 659.25, duration: 0.5 },   // E5
-            { freq: 523.25, duration: 1 },     // C5
-            { freq: 587.33, duration: 0.5 },   // D5
-            { freq: 659.25, duration: 0.5 },   // E5
-            { freq: 523.25, duration: 1 },     // C5
-        ];
-
-        let time = now;
-        melody.forEach(note => {
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-            
-            osc.type = 'square';
-            osc.frequency.value = note.freq;
-            
-            gain.gain.setValueAtTime(0.1, time);
-            gain.gain.exponentialRampToValueAtTime(0.01, time + note.duration * beatDuration);
-            
-            osc.connect(gain);
-            gain.connect(audioContext.destination);
-            
-            osc.start(time);
-            osc.stop(time + note.duration * beatDuration);
-            
-            oscillators.push(osc);
-            time += note.duration * beatDuration;
-        });
-
-        setTimeout(() => {
-            if (gameActive && musicStarted) {
-                startRetrowaveMusic();
-            }
-        }, time * 1000 - now * 1000);
+            notification.style.animation = 'quoteDisappear 0.5s ease-out forwards';
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
     }
 
     function endGame(win) {
@@ -824,14 +702,13 @@
             }, 500);
         } else {
             document.body.style.backgroundColor = '#330000';
-            setTimeout(() => {
-                alert("Caught! Try again.");
-                location.reload();
+            setTimeout(() => { 
+                alert("Caught by the Glooms! Love is tough, try again."); 
+                location.reload(); 
             }, 100);
         }
     }
 
-    // Input handling
     document.addEventListener('keydown', e => {
         if(e.key === 'ArrowLeft' || e.key === 'a') pacman.nextDir = -1;
         if(e.key === 'ArrowRight' || e.key === 'd') pacman.nextDir = 1;
@@ -840,63 +717,31 @@
     });
 
     let tsX, tsY;
-    document.addEventListener('touchstart', e => {
-        tsX = e.touches[0].clientX;
-        tsY = e.touches[0].clientY;
-    }, {passive: false});
-    
+    document.addEventListener('touchstart', e => { tsX = e.touches[0].clientX; tsY = e.touches[0].clientY; }, {passive: false});
     document.addEventListener('touchend', e => {
         let dx = e.changedTouches[0].clientX - tsX;
         let dy = e.changedTouches[0].clientY - tsY;
         if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
-            if(Math.abs(dx) > Math.abs(dy)) {
-                pacman.nextDir = dx > 0 ? 1 : -1;
-            } else {
-                pacman.nextDir = dy > 0 ? width : -width;
-            }
+            if(Math.abs(dx) > Math.abs(dy)) pacman.nextDir = dx > 0 ? 1 : -1;
+            else pacman.nextDir = dy > 0 ? width : -width;
         }
     }, {passive: false});
 
-    // Start button
     document.getElementById('start-btn').addEventListener('click', () => {
         startScreen.classList.add('hidden');
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
+        // Play Music
+        musicAudio.play().catch(e => console.log("Audio play failed interaction required"));
         init();
         gameActive = true;
-        startRetrowaveMusic();
         gameLoop();
     });
 
-    window.addEventListener('resize', () => {
-        if(gameActive) init();
-    });
+    window.addEventListener('resize', () => { if(gameActive) init(); });
 
-    // Add quote animation styles
     const style = document.createElement('style');
     style.textContent = `
-        @keyframes quoteAppear {
-            from {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
-        
-        @keyframes quoteDisappear {
-            from {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-            to {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8);
-            }
-        }
+        @keyframes quoteAppear { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+        @keyframes quoteDisappear { from { opacity: 1; transform: translate(-50%, 0); } to { opacity: 0; transform: translate(-50%, -20px); } }
     `;
     document.head.appendChild(style);
 </script>
