@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HEARTMAN: Hug Edition</title>
+    <title>HEARTMAN: Hug Day Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -11,35 +11,49 @@
         :root {
             --primary: #ff1493;
             --secondary: #00d4ff;
-            --accent: #ff006e;
             --dark-bg: #0a0e27;
-            --darker-bg: #050810;
             --neon-pink: #ff007f;
             --neon-cyan: #00ffff;
         }
         
         body {
-            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a0033 50%, var(--darker-bg) 100%);
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1a0033 50%, #000 100%);
             overflow: hidden;
             touch-action: none;
             user-select: none;
-            -webkit-user-select: none;
             font-family: 'Press Start 2P', cursive;
             color: #fff;
-            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         
         #game-container {
             position: relative;
-            width: 100vw;
-            height: 100dvh;
+            width: 100%;
+            max-width: 600px;
             display: flex;
-            justify-content: center;
-            align-items: center;
             flex-direction: column;
-            background: radial-gradient(ellipse at 50% 50%, rgba(255, 20, 147, 0.1) 0%, transparent 70%);
+            align-items: center;
         }
         
+        /* Stats Bar */
+        .ui-layer {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            font-size: 10px;
+            text-shadow: 0 0 5px var(--neon-pink);
+            margin-bottom: 5px;
+        }
+        
+        .score-label { color: var(--neon-pink); }
+        .goal-label { color: var(--neon-cyan); }
+
+        /* The Game Board */
         canvas {
             border: 4px solid var(--neon-pink);
             box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
@@ -48,70 +62,47 @@
             display: block;
             image-rendering: pixelated;
         }
-        
-        /* UI Layers */
-        .ui-layer {
-            width: 100%;
-            max-width: 560px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            box-sizing: border-box;
-            z-index: 10;
-            font-size: 10px;
-            text-shadow: 0 0 5px var(--neon-pink);
-            margin-bottom: 5px;
-        }
-        
-        .score-label { color: var(--neon-pink); }
-        #score-el { color: var(--neon-cyan); }
-        .goal-label { color: var(--neon-cyan); }
-        #target-el { color: #fff; }
 
         /* Controls */
         .bottom-controls {
             width: 100%;
-            max-width: 560px;
             margin-top: 10px;
-            padding: 8px;
+            padding: 10px;
             background: rgba(0, 0, 0, 0.8);
             border: 2px solid #333;
             border-radius: 4px;
             display: flex;
             justify-content: space-around;
-            align-items: center;
             font-size: 8px;
             color: #aaa;
             text-transform: uppercase;
         }
-        .control-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .control-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .control-icon { font-size: 16px; }
 
-        /* Overlays */
+        /* Overlays (Start, Game Over, Finale) */
         .overlay-screen {
             position: absolute;
-            inset: 0;
+            top: 0; left: 0; width: 100%; height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(8px);
             z-index: 50;
-            backdrop-filter: blur(10px);
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s;
         }
         
-        .hidden { opacity: 0; pointer-events: none; }
+        .hidden { opacity: 0; pointer-events: none; visibility: hidden; }
         
         #start-screen { background: rgba(10, 14, 39, 0.95); }
         #game-over-screen { background: rgba(30, 0, 0, 0.95); }
         #finale-screen { background: #000; border: 4px solid var(--neon-pink); }
 
-        /* Typography */
+        /* Text Styles */
         .title-main {
             font-family: 'Orbitron', sans-serif;
             font-size: clamp(2rem, 8vw, 3.5rem);
-            font-weight: 900;
             color: var(--neon-pink);
             text-shadow: 4px 4px 0px #550022;
             margin-bottom: 10px;
@@ -137,17 +128,19 @@
             margin-top: 20px;
             text-transform: uppercase;
         }
-        .retro-btn:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0px rgba(255, 0, 127, 0.4); }
+        .retro-btn:active { transform: translate(2px, 2px); box-shadow: none; }
 
-        /* Finale Elements */
-        .pixel-heart-container { margin-bottom: 30px; transform: scale(3); }
+        /* Finale Heart Animation */
         .pixel-heart-art {
-            width: 10px; height: 10px; background: transparent;
+            width: 10px; height: 10px; 
+            background: transparent;
             color: var(--neon-pink);
             box-shadow: 20px 0, 50px 0, 10px 10px, 60px 10px, 0 20px, 70px 20px, 0 30px, 70px 30px, 0 40px, 70px 40px, 10px 50px, 60px 50px, 20px 60px, 50px 60px, 30px 70px, 40px 70px;
+            transform: scale(3);
+            margin-bottom: 50px;
             animation: beat 0.8s infinite alternate;
         }
-        @keyframes beat { to { transform: scale(1.1); filter: brightness(1.2); } }
+        @keyframes beat { to { transform: scale(3.3); filter: brightness(1.2); } }
 
         .finale-text { text-align: center; max-width: 80%; }
         .finale-quote {
@@ -156,13 +149,13 @@
             padding: 15px; border: 2px dashed #333;
         }
 
-        /* Popup */
+        /* Powerup Popup */
         #quote-popup {
-            position: fixed; top: 20px; left: 50%; transform: translate(-50%, -20px);
+            position: fixed; top: 10%; left: 50%; transform: translate(-50%, -20px);
             background: #000; color: var(--neon-pink);
             padding: 10px 15px; border: 2px solid var(--neon-pink);
             font-size: 8px; text-align: center; z-index: 100;
-            width: 280px; opacity: 0; transition: all 0.3s;
+            width: 280px; opacity: 0; transition: all 0.3s; pointer-events: none;
         }
         #quote-popup.visible { opacity: 1; transform: translate(-50%, 0); }
     </style>
@@ -171,14 +164,14 @@
 
 <div id="game-container">
     <div class="ui-layer">
-        <div><span class="score-label">PTS:</span> <span id="score-el">0</span></div>
-        <div><span class="goal-label">GOAL:</span> <span id="target-el">0</span></div>
+        <div>SCORE: <span id="score-el">0</span></div>
+        <div>GOAL: <span id="target-el">0</span></div>
     </div>
 
     <canvas id="gameCanvas"></canvas>
 
     <div class="bottom-controls">
-        <div class="control-item"><div class="control-icon">🕹️</div><div>Swipe</div></div>
+        <div class="control-item"><div class="control-icon">👆</div><div>Swipe</div></div>
         <div class="control-item"><div class="control-icon">❤️</div><div>Collect</div></div>
         <div class="control-item"><div class="control-icon">⚡</div><div>Powerup</div></div>
     </div>
@@ -186,20 +179,20 @@
     <div id="start-screen" class="overlay-screen">
         <div class="title-main">HEART<br>MAN</div>
         <div class="title-sub">HUG DAY EDITION</div>
-        <div id="enemies-display" style="margin: 20px 0; text-align: center; font-size: 8px; line-height: 1.8;"></div>
+        <div id="enemies-list" style="font-size: 8px; line-height: 2; margin-bottom: 20px;"></div>
         <button id="start-btn" class="retro-btn">INSERT COIN</button>
     </div>
 
     <div id="game-over-screen" class="overlay-screen hidden">
         <h1 style="color: #ff3333; margin-bottom: 20px;">GAME OVER</h1>
-        <p style="font-size: 0.7rem; color: #ccc; text-align: center; line-height: 1.5;">The Glooms won.<br>But love persists.</p>
-        <button class="retro-btn" onclick="location.reload()">RETRY</button>
+        <p style="font-size: 0.7rem; color: #ccc; margin-bottom: 20px;">The Glooms won.<br>But love never gives up.</p>
+        <button class="retro-btn" onclick="location.reload()">TRY AGAIN</button>
     </div>
 
     <div id="finale-screen" class="overlay-screen hidden">
-        <div class="pixel-heart-container"><div class="pixel-heart-art"></div></div>
+        <div class="pixel-heart-art"></div>
         <div class="finale-text">
-            <h2 style="color: var(--neon-pink); margin-bottom: 15px;">HAPPY HUG DAY</h2>
+            <h2 style="color: var(--neon-pink);">HAPPY HUG DAY</h2>
             <div id="final-quote-container" class="finale-quote"></div>
             <button class="retro-btn" onclick="location.reload()">PLAY AGAIN</button>
         </div>
@@ -209,21 +202,28 @@
 </div>
 
 <script>
-    // --- VARIABLES ---
+    // --- 1. GLOBAL VARIABLES & CONFIG ---
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    const scoreEl = document.getElementById('score-el');
-    const targetEl = document.getElementById('target-el');
-    const startScreen = document.getElementById('start-screen');
-    const gameOverScreen = document.getElementById('game-over-screen');
-    const finaleScreen = document.getElementById('finale-screen');
-    const quotePopup = document.getElementById('quote-popup');
-    const finalQuoteContainer = document.getElementById('final-quote-container');
-
     const width = 28;
     const TILE_SIZE = 20;
+
+    // Game State
+    let gameActive = false;
+    let score = 0;
+    let winningScore = 0;
+    let audioCtx = null;
+    let melodyInterval = null;
     
-    // Layout: 0=Dot, 1=Wall, 3=Powerup, 4=Empty
+    // Player
+    let pacman = { 
+        index: 490, 
+        prevIndex: 490, 
+        dir: 0, // 0 = stopped
+        nextDir: 0 
+    };
+
+    // Level Layout (1=Wall, 0=Dot, 3=Powerup, 4=Empty/GhostHouse)
     const layout = [
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
         1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,
@@ -254,39 +254,32 @@
         1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
         1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
     ];
+    let squares = new Array(layout.length).fill(false);
 
-    // Data must be defined BEFORE Init
+    // Ghosts
     let ghosts = [
-        { name: 'blinky', index: 348, prevIndex: 348, speed: 130, timer: 0, scared: false, start: 348, currentDir: -1, color: '#ff1744', displayName: 'STRESS', icon: '😡' },
-        { name: 'pinky', index: 376, prevIndex: 376, speed: 180, timer: 0, scared: false, start: 376, currentDir: -1, color: '#ff6ec7', displayName: 'ANXIETY', icon: '😰' },
-        { name: 'inky', index: 351, prevIndex: 351, speed: 220, timer: 0, scared: false, start: 351, currentDir: 1, color: '#9c27b0', displayName: 'DOUBT', icon: '😵‍💫' },
-        { name: 'clyde', index: 379, prevIndex: 379, speed: 280, timer: 0, scared: false, start: 379, currentDir: 1, color: '#00bcd4', displayName: 'LONELINESS', icon: '🥺' }
+        { name: 'blinky', index: 348, prevIndex: 348, speed: 130, timer: 0, scared: false, start: 348, color: '#ff1744', displayName: 'STRESS', icon: '😡' },
+        { name: 'pinky', index: 376, prevIndex: 376, speed: 180, timer: 0, scared: false, start: 376, color: '#ff6ec7', displayName: 'ANXIETY', icon: '😰' },
+        { name: 'inky', index: 351, prevIndex: 351, speed: 220, timer: 0, scared: false, start: 351, color: '#9c27b0', displayName: 'DOUBT', icon: '😵‍💫' },
+        { name: 'clyde', index: 379, prevIndex: 379, speed: 280, timer: 0, scared: false, start: 379, color: '#00bcd4', displayName: 'LONELY', icon: '🥺' }
     ];
 
-    let pacman = { index: 490, prevIndex: 490, dir: 1, nextDir: 1 };
-    let squares = [];
-    let score = 0;
-    let winningScore = 0;
-    let gameActive = false;
-    let audioContext = null;
-    let currentSessionQuotes = [];
-
+    // Quotes
     const powerupQuotes = [
         "Imagine me grabbing your bum while we kiss", "Imagine us kissing in the rain",
-        "Imagine us cuddling in a thunderstorm", "I want to wake up next to you daily",
-        "Your laugh is my favorite sound", "You are my safe space",
-        "Every love song is about you", "I'd choose you in a hundred lifetimes",
-        "Imagine dancing to jazz in the kitchen", "You make the gloomy days sunny",
-        "I am so addicted to you", "Imagine holding hands on an old street",
+        "I want to wake up next to you daily", "Your laugh is my favorite sound",
+        "You are my safe space", "Every love song is about you",
+        "I'd choose you in a hundred lifetimes", "Imagine dancing to jazz in the kitchen",
+        "You make the gloomy days sunny", "I am so addicted to you",
         "My heart beats faster near you", "You are the best thing ever",
         "I love you more than pizza", "Imagine a lazy Sunday in sheets",
         "You are my home", "I just want to hold you tight",
         "Even when I'm angry, I love you", "Imagine us growing old flirting",
         "You're the peanut butter to my jelly", "I love it when you smile at me",
-        "Imagine late night drives holding hands", "You smell like home",
+        "Imagine late night drives", "You smell like home",
         "I crave your touch constantly", "You are my favorite distraction",
         "I love you to the moon and back", "You are my happy place",
-        "Imagine us star gazing on a hill", "I love the way you look at me",
+        "Imagine us star gazing", "I love the way you look at me",
         "You're my dream come true", "Imagine breakfast in bed together",
         "I want to steal your hoodies", "You're sweeter than chocolate",
         "I get butterflies seeing you", "Imagine us adopting a puppy",
@@ -296,253 +289,303 @@
 
     const finaleQuotes = [
         "No matter how bad the situations are, love always finds a way. I love your hugs.",
-        "In your arms is the only place I want to be.", "A hug from you mends all my broken pieces.",
-        "Distance means nothing when one hug can change everything.", "I would fight the world just to end the day in your arms.",
-        "Your hugs are my anchor in this stormy world.", "One hug from you wipes away a thousand worries.",
-        "Home is not a place, it's the feeling of your arms around me.", "I survived the maze of life just to find your embrace.",
-        "The best gift you can give me is a tight hug that lasts forever.", "My favorite place in the universe? Right next to you.",
-        "Through every gloom and every fear, I choose you.", "You are the pause button on my chaotic life.",
-        "Let's stay tangled in a hug until the world ends.", "Your heartbeat is the rhythm I want to fall asleep to.",
-        "Nothing feels as safe as being held by you.", "I gathered all this love just to give it to you.",
-        "A hug is a handshake from the heart, and my heart is yours.", "You are the warmth in my coldest winters.",
+        "In your arms is the only place I want to be.", 
+        "A hug from you mends all my broken pieces.",
+        "Distance means nothing when one hug can change everything.", 
+        "I would fight the world just to end the day in your arms.",
+        "Your hugs are my anchor in this stormy world.", 
+        "One hug from you wipes away a thousand worries.",
+        "Home is not a place, it's the feeling of your arms around me.", 
+        "I survived the maze of life just to find your embrace.",
+        "The best gift you can give me is a tight hug that lasts forever.", 
+        "My favorite place in the universe? Right next to you.",
+        "Through every gloom and every fear, I choose you.", 
+        "You are the pause button on my chaotic life.",
+        "Let's stay tangled in a hug until the world ends.", 
+        "Your heartbeat is the rhythm I want to fall asleep to.",
+        "Nothing feels as safe as being held by you.", 
+        "I gathered all this love just to give it to you.",
+        "A hug is a handshake from the heart, and my heart is yours.", 
+        "You are the warmth in my coldest winters.",
         "Here's to a lifetime of hugs, laughter, and us."
     ];
+    let sessionQuotes = [];
 
-    // --- GAME ENGINE ---
-    
-    function displayEnemiesOnTitle() {
-        const enemiesDisplay = document.getElementById('enemies-display');
-        if (!enemiesDisplay) return;
-        let html = '<div style="margin-bottom: 8px; color: #ff007f;">THE GLOOMS:</div>';
-        ghosts.forEach(g => {
-            html += `<div style="margin: 4px 0; color: ${g.color}; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                        <span>${g.icon}</span> <span>${g.displayName}</span>
-                     </div>`;
-        });
-        enemiesDisplay.innerHTML = html;
+    // --- 2. AUDIO SYSTEM (Procedural = No External Files) ---
+    function initAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        // Simple Synthwave Bassline Arpeggio
+        const notes = [130.81, 155.56, 196.00, 155.56, 130.81, 116.54, 155.56, 116.54]; // C3 scale
+        let noteIdx = 0;
+
+        if (melodyInterval) clearInterval(melodyInterval);
+        
+        melodyInterval = setInterval(() => {
+            if(!gameActive) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(notes[noteIdx % notes.length], audioCtx.currentTime);
+            
+            // Filter for retro sound
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 800;
+            
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+            noteIdx++;
+        }, 200); // Speed of music
     }
 
-    function init() {
-        const availableHeight = window.innerHeight * 0.65;
-        const availableWidth = window.innerWidth * 0.95;
-        let scale = Math.min(availableWidth / (width * TILE_SIZE), availableHeight / (width * TILE_SIZE));
+    // --- 3. GAME LOGIC ---
+
+    function initGame() {
+        // Resize Canvas
+        const h = window.innerHeight * 0.65;
+        const w = window.innerWidth * 0.95;
+        const scale = Math.min(w / (width * TILE_SIZE), h / (width * TILE_SIZE));
         canvas.width = width * TILE_SIZE * scale;
         canvas.height = width * TILE_SIZE * scale;
         ctx.scale(scale, scale);
 
+        // Reset Variables
+        pacman = { index: 490, prevIndex: 490, dir: 0, nextDir: 0 };
+        squares = new Array(layout.length).fill(false);
+        score = 0;
+        
+        // Calc Winning Score
         winningScore = 0;
-        squares = [];
-        layout.forEach(cell => {
-            if(cell === 0) winningScore++;
-            if(cell === 3) winningScore+=50;
+        layout.forEach(c => { if(c===0) winningScore++; if(c===3) winningScore+=50; });
+        document.getElementById('target-el').innerText = winningScore;
+        document.getElementById('score-el').innerText = 0;
+        
+        // Reset Ghosts
+        ghosts.forEach(g => {
+            g.index = g.start;
+            g.prevIndex = g.start;
+            g.scared = false;
         });
-        targetEl.innerText = winningScore;
-        currentSessionQuotes = [...powerupQuotes].sort(() => 0.5 - Math.random()).slice(0, 4);
-        
-        drawBoard();
+
+        // Quotes
+        sessionQuotes = [...powerupQuotes].sort(() => 0.5 - Math.random()).slice(0, 4);
+
+        // Populate Start Screen List
+        const list = document.getElementById('enemies-list');
+        list.innerHTML = '';
+        ghosts.forEach(g => {
+            list.innerHTML += `<div style="color:${g.color}">${g.icon} ${g.displayName}</div>`;
+        });
     }
 
-    // --- SYNTHWAVE AUDIO ENGINE (Code Generated = 100% Reliable) ---
-    function playMusic() {
-        if(!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
-        const bpm = 130;
-        const noteDuration = 60 / bpm;
-        let nextNoteTime = audioContext.currentTime;
-
-        // Bassline Notes (Retro Arpeggio)
-        const bassNotes = [65.41, 65.41, 77.78, 77.78, 87.31, 87.31, 98.00, 98.00]; // C2, Eb2, F2, G2
-        let noteIndex = 0;
-
-        function scheduler() {
-            while (nextNoteTime < audioContext.currentTime + 0.1) {
-                playNote(bassNotes[noteIndex % bassNotes.length], nextNoteTime);
-                nextNoteTime += noteDuration / 2; // 8th notes
-                noteIndex++;
-            }
-            if(gameActive) setTimeout(scheduler, 25);
-        }
-
-        function playNote(freq, time) {
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.value = freq;
-            
-            // Lowpass filter for "muffled" retro sound
-            const filter = audioContext.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.value = 800;
-
-            osc.connect(filter);
-            filter.connect(gain);
-            gain.connect(audioContext.destination);
-
-            gain.gain.setValueAtTime(0.1, time);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.2);
-
-            osc.start(time);
-            osc.stop(time + 0.2);
-        }
-        scheduler();
-    }
-
-    // --- GAME LOOP ---
     function gameLoop() {
         if (!gameActive) return;
 
-        // Pacman Move
-        let moveIdx = pacman.index + pacman.nextDir;
-        if(layout[moveIdx] !== 1 && layout[moveIdx] !== 2) pacman.dir = pacman.nextDir;
+        // 1. Pacman Movement
+        let moveIdx = pacman.index;
+        if (pacman.nextDir !== 0) {
+            let nextPos = pacman.index + pacman.nextDir;
+            if (layout[nextPos] !== 1 && layout[nextPos] !== 2) {
+                pacman.dir = pacman.nextDir;
+            }
+        }
         
-        moveIdx = pacman.index + pacman.dir;
-        if (layout[moveIdx] !== 1 && layout[moveIdx] !== 2) {
-            pacman.prevIndex = pacman.index;
-            pacman.index = moveIdx;
+        if (pacman.dir !== 0) {
+            let nextPos = pacman.index + pacman.dir;
+            if (layout[nextPos] !== 1 && layout[nextPos] !== 2) {
+                pacman.prevIndex = pacman.index;
+                pacman.index = nextPos;
+            }
         }
 
-        // Tunnel
-        if(pacman.index === 392) pacman.index = 419;
-        else if(pacman.index === 419) pacman.index = 392;
+        // Tunnel handling
+        if (pacman.index === 392) pacman.index = 419;
+        else if (pacman.index === 419) pacman.index = 392;
 
-        // Eat
+        // 2. Eating
         if (layout[pacman.index] === 0 && !squares[pacman.index]) {
-            score++; squares[pacman.index] = true;
-            scoreEl.innerText = score;
+            score++;
+            squares[pacman.index] = true;
+            document.getElementById('score-el').innerText = score;
         } else if (layout[pacman.index] === 3 && !squares[pacman.index]) {
-            score += 50; squares[pacman.index] = true;
-            scoreEl.innerText = score;
-            let qt = currentSessionQuotes.length > 0 ? currentSessionQuotes.pop() : "Bonus Love!";
-            showHugQuote(qt);
-            ghosts.forEach(g => g.scared = true);
-            setTimeout(() => ghosts.forEach(g => g.scared = false), 10000);
-            if(navigator.vibrate) navigator.vibrate(50);
+            score += 50;
+            squares[pacman.index] = true;
+            document.getElementById('score-el').innerText = score;
+            triggerPowerup();
         }
 
         if (score >= winningScore) { endGame(true); return; }
 
-        // Ghost AI
-        ghosts.forEach(ghost => {
-            ghost.timer++;
-            let thresh = ghost.scared ? 12 : (ghost.name === 'blinky' ? 4 : 6);
-            if(ghost.timer > thresh) {
-                ghost.timer = 0;
-                const moves = [-1, 1, -width, width].filter(d => {
-                    let next = ghost.index + d;
-                    return layout[next] !== 1 && (ghost.scared || d !== -ghost.currentDir);
+        // 3. Ghost AI
+        ghosts.forEach(g => {
+            g.timer++;
+            let thresh = g.scared ? 15 : 6; // Slower ghosts for playability
+            
+            if (g.timer > thresh) {
+                g.timer = 0;
+                const dirs = [-1, 1, -width, width];
+                
+                // Valid moves (not wall, and don't reverse unless stuck)
+                let valid = dirs.filter(d => {
+                    let next = g.index + d;
+                    return layout[next] !== 1 && (g.scared || d !== -g.currentDir); 
                 });
 
-                if(moves.length > 0) {
-                    let best = moves[0];
-                    if(!ghost.scared) {
-                        let t = pacman.index; // Targeting
-                        let min = Infinity;
-                        moves.forEach(d => {
-                            let tx = t % width, ty = Math.floor(t / width);
-                            let gx = (ghost.index+d) % width, gy = Math.floor((ghost.index+d)/width);
-                            let dst = Math.sqrt((tx-gx)**2 + (ty-gy)**2);
-                            if(dst < min) { min = dst; best = d; }
+                if (valid.length === 0) valid = dirs.filter(d => layout[g.index+d] !== 1);
+
+                if (valid.length > 0) {
+                    let best = valid[Math.floor(Math.random() * valid.length)];
+                    
+                    if (!g.scared) {
+                        // Chase Logic
+                        let t = pacman.index;
+                        // Pinky aims ahead
+                        if(g.name === 'pinky') t += pacman.dir * 4;
+                        
+                        let minDst = Infinity;
+                        valid.forEach(d => {
+                            let cx = (g.index+d)%width, cy = Math.floor((g.index+d)/width);
+                            let tx = t%width, ty = Math.floor(t/width);
+                            let dst = Math.sqrt((cx-tx)**2 + (cy-ty)**2);
+                            if(dst < minDst) { minDst = dst; best = d; }
                         });
-                    } else {
-                        best = moves[Math.floor(Math.random() * moves.length)];
                     }
-                    ghost.prevIndex = ghost.index;
-                    ghost.index += best;
-                    ghost.currentDir = best;
+                    g.prevIndex = g.index;
+                    g.index += best;
+                    g.currentDir = best; // Store current direction to prevent jitter
                 }
             }
-
-            // COLLISION CHECK (Swapping logic fixes pass-through bug)
-            if (ghost.index === pacman.index || (ghost.index === pacman.prevIndex && ghost.prevIndex === pacman.index)) {
-                if(ghost.scared) {
-                    ghost.index = ghost.start;
-                    score += 100; scoreEl.innerText = score;
+            
+            // 4. Collision (Pass-Through Logic)
+            let hit = (g.index === pacman.index) || (g.index === pacman.prevIndex && g.prevIndex === pacman.index);
+            
+            if (hit) {
+                if (g.scared) {
+                    g.index = g.start;
                 } else {
                     endGame(false);
                 }
             }
         });
 
-        drawBoard();
-        setTimeout(() => requestAnimationFrame(gameLoop), 50);
+        draw();
+        requestAnimationFrame(gameLoop);
     }
 
-    function drawBoard() {
-        ctx.fillStyle = '#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
-        layout.forEach((c, i) => {
-            let x = (i%width)*TILE_SIZE, y = Math.floor(i/width)*TILE_SIZE;
-            if(c===1) {
-                ctx.fillStyle = '#1a1a3e'; ctx.fillRect(x,y,TILE_SIZE,TILE_SIZE);
-                ctx.strokeStyle = '#ff007f'; ctx.lineWidth=1; ctx.strokeRect(x+4,y+4,TILE_SIZE-8,TILE_SIZE-8);
-            } else if(c===0 && !squares[i]) {
-                ctx.fillStyle = '#fbcfe8'; ctx.beginPath(); ctx.arc(x+10,y+10,2,0,6.28); ctx.fill();
-            } else if(c===3 && !squares[i]) {
-                ctx.fillStyle = '#ff007f'; ctx.beginPath(); ctx.arc(x+10,y+10,6,0,6.28); ctx.fill();
+    function triggerPowerup() {
+        let text = sessionQuotes.length > 0 ? sessionQuotes.pop() : "Bonus Love!";
+        const p = document.getElementById('quote-popup');
+        p.innerText = text;
+        p.classList.add('visible');
+        setTimeout(() => p.classList.remove('visible'), 3000);
+        
+        ghosts.forEach(g => g.scared = true);
+        setTimeout(() => ghosts.forEach(g => g.scared = false), 8000);
+        if(navigator.vibrate) navigator.vibrate(50);
+    }
+
+    function draw() {
+        // Clear
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Map
+        layout.forEach((cell, i) => {
+            let x = (i % width) * TILE_SIZE;
+            let y = Math.floor(i / width) * TILE_SIZE;
+            
+            if (cell === 1) {
+                ctx.fillStyle = '#1a1a3e';
+                ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                ctx.strokeStyle = '#ff007f';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(x+4, y+4, TILE_SIZE-8, TILE_SIZE-8);
+            } else if (cell === 0 && !squares[i]) {
+                ctx.fillStyle = '#fbcfe8';
+                ctx.beginPath(); ctx.arc(x+10, y+10, 2, 0, 6.28); ctx.fill();
+            } else if (cell === 3 && !squares[i]) {
+                ctx.fillStyle = '#ff007f';
+                ctx.beginPath(); ctx.arc(x+10, y+10, 6, 0, 6.28); ctx.fill();
             }
         });
 
-        // Player
-        let px = (pacman.index%width)*TILE_SIZE+10, py = Math.floor(pacman.index/width)*TILE_SIZE+10;
+        // Pacman
+        let px = (pacman.index % width) * TILE_SIZE + 10;
+        let py = Math.floor(pacman.index / width) * TILE_SIZE + 10;
         ctx.font = "20px Arial"; ctx.textAlign="center"; ctx.textBaseline="middle";
         ctx.fillText('❤️', px, py+2);
 
         // Ghosts
         ghosts.forEach(g => {
-            let gx = (g.index%width)*TILE_SIZE+10, gy = Math.floor(g.index/width)*TILE_SIZE+10;
+            let gx = (g.index % width) * TILE_SIZE + 10;
+            let gy = Math.floor(g.index / width) * TILE_SIZE + 10;
             ctx.fillText(g.scared ? '🫥' : g.icon, gx, gy+2);
         });
     }
 
-    function showHugQuote(text) {
-        quotePopup.innerText = text;
-        quotePopup.classList.add('visible');
-        setTimeout(() => quotePopup.classList.remove('visible'), 3000);
-    }
-
     function endGame(win) {
         gameActive = false;
-        if(win) {
-            finaleScreen.classList.remove('hidden');
-            let q = finaleQuotes[Math.floor(Math.random()*finaleQuotes.length)];
-            finalQuoteContainer.innerText = `"${q}"`;
+        clearInterval(melodyInterval);
+        
+        if (win) {
+            document.getElementById('finale-screen').classList.remove('hidden');
+            let q = finaleQuotes[Math.floor(Math.random() * finaleQuotes.length)];
+            document.getElementById('final-quote-container').innerText = `"${q}"`;
             if(navigator.vibrate) navigator.vibrate([100,50,100]);
         } else {
-            gameOverScreen.classList.remove('hidden');
+            document.getElementById('game-over-screen').classList.remove('hidden');
             if(navigator.vibrate) navigator.vibrate(200);
         }
     }
 
-    // Input
-    document.addEventListener('keydown', e => {
-        if(e.key.includes('Left')) pacman.nextDir = -1;
-        if(e.key.includes('Right')) pacman.nextDir = 1;
-        if(e.key.includes('Up')) pacman.nextDir = -width;
-        if(e.key.includes('Down')) pacman.nextDir = width;
+    // --- 4. CONTROLS & INIT ---
+    
+    // Start Button
+    document.getElementById('start-btn').addEventListener('click', () => {
+        document.getElementById('start-screen').classList.add('hidden');
+        initGame();
+        initAudio();
+        gameActive = true;
+        requestAnimationFrame(gameLoop);
     });
 
-    let tx, ty;
-    document.addEventListener('touchstart', e => { e.preventDefault(); tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, {passive: false});
+    // Keyboard
+    document.addEventListener('keydown', e => {
+        if(e.key === 'ArrowLeft') pacman.nextDir = -1;
+        if(e.key === 'ArrowRight') pacman.nextDir = 1;
+        if(e.key === 'ArrowUp') pacman.nextDir = -width;
+        if(e.key === 'ArrowDown') pacman.nextDir = width;
+    });
+
+    // Touch
+    let tsX, tsY;
+    document.addEventListener('touchstart', e => { 
+        // Only prevent default if touching canvas area to allow button clicks
+        if(e.target.tagName !== 'BUTTON') e.preventDefault();
+        tsX = e.touches[0].clientX; tsY = e.touches[0].clientY; 
+    }, {passive: false});
+    
     document.addEventListener('touchend', e => {
-        let dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
-        if(Math.abs(dx)>20 || Math.abs(dy)>20) {
+        let dx = e.changedTouches[0].clientX - tsX;
+        let dy = e.changedTouches[0].clientY - tsY;
+        if(Math.abs(dx) > 20 || Math.abs(dy) > 20) {
             if(Math.abs(dx) > Math.abs(dy)) pacman.nextDir = dx > 0 ? 1 : -1;
             else pacman.nextDir = dy > 0 ? width : -width;
         }
     }, {passive: false});
 
-    document.getElementById('start-btn').addEventListener('click', () => {
-        startScreen.classList.add('hidden');
-        displayEnemiesOnTitle(); // Init visuals
-        playMusic(); // Start Audio
-        init(); // Start Game
-        gameActive = true;
-        gameLoop();
-    });
-
-    window.addEventListener('resize', () => { if(gameActive) init(); });
-    
-    // Init enemies display on load
-    displayEnemiesOnTitle();
+    // Initial setup on load
+    initGame();
 </script>
+
 </body>
 </html>
